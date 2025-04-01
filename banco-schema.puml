@@ -1,0 +1,45 @@
+@startuml
+entity "Sucursales" {
+    * nombreSuc : varchar(50) <<PK>>
+    ciudadSuc : varchar(50)
+    activo : FLOAT
+}
+
+entity "Empleados" {
+    * dniEmp : varchar(10) <<PK>>
+    nombreEmp : varchar(50)
+    telefono : varchar(10)
+    nombreSuc : varchar(50) <<FK>>
+}
+
+entity "Cuentas" {
+    * numeroCta : varchar(5) <<PK>>
+    saldo : FLOAT
+    nombreSuc : varchar(50) <<FK>>
+}
+
+entity "Clientes" {
+    * dniCli : varchar(10) <<PK>>
+    nombreCli : varchar(50)
+    domicilio : varchar(50)
+}
+
+entity "Transacciones" {
+    * numeroCta : varchar(5) <<FK>>
+    * numeroTrans : varchar(5) <<PK>>
+    fecha : DATE
+    importe : FLOAT
+}
+
+entity "CtaCli" {
+    * dniCli : varchar(10) <<FK>>
+    * numeroCta : varchar(5) <<FK>>
+}
+
+' Relaciones
+Sucursales ||..o{ Empleados : "nombreSuc"
+Sucursales ||..o{ Cuentas : "nombreSuc"
+Cuentas ||--o{ Transacciones : "numeroCta"
+Clientes ||--o{ CtaCli : "dniCli"
+Cuentas ||--o{ CtaCli : "numeroCta"
+@enduml
