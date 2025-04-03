@@ -1,0 +1,163 @@
+== Operaciones DML sobre la Base de Datos Banco
+
+=== Inserción de Datos (INSERT)
+
+==== Inserción Simple
+[source,sql]
+----
+-- Insertar un nuevo cliente con nombre y domicilio
+-- (el resto de campos se completan automáticamente)
+INSERT INTO Clientes 
+VALUES ('Ana García', 10, 'Calle Mayor 123');
+
+-- Insertar una nueva sucursal
+INSERT INTO Sucursales 
+VALUES ('Central', 'Madrid', 1000000);
+----
+
+==== Inserción Múltiple
+[source,sql]
+----
+-- Insertar varios empleados a la vez, pero sin especificar el telefono
+INSERT INTO Empleados (dniEmp, nombreEmp, nombreSuc)
+VALUES 
+    ('16', 'Juan Pérez', 'Central'),
+    ('17', 'María López', 'Central'),
+    ('18', 'Pedro García', 'Central');
+
+-- Insertar varias cuentas
+INSERT INTO Cuentas 
+VALUES 
+    (10, 50000, 'Central'),
+    (11, 75000, 'Central'),
+    (12, 90000, 'Central');
+----
+
+==== Inserción basada en consultas
+[source,sql]
+----
+-- Crear cuentas para todos los empleados de la sucursal Central
+INSERT INTO Cuentas 
+SELECT 
+    dniEmp + 100,    -- Número de cuenta creado a partir del dni
+    50000,          -- Saldo inicial
+    nombreSuc       -- Misma sucursal donde trabaja
+FROM Empleados 
+WHERE nombreSuc = 'Central';
+
+-- Vincular las cuentas creadas con los empleados
+INSERT INTO CtaCli (dniCli, numeroCta)
+SELECT 
+    dniEmp,
+    dniEmp + 100  -- Usar el mismo número de cuenta creado
+FROM Empleados 
+WHERE nombreSuc = 'Central';
+----
+
+=== Actualización de Datos (UPDATE)
+
+==== Actualización Simple
+[source,sql]
+----
+-- Incrementar el saldo de todas las cuentas de la sucursal Central en un 10%
+UPDATE Cuentas
+SET saldo = saldo * 1.10
+WHERE nombreSuc = 'Central';
+
+-- Cambiar el domicilio de un cliente
+UPDATE Clientes
+SET domicilio = 'Nueva Calle 456'
+WHERE dniCli = 10;
+----
+
+==== Actualización con Subconsultas
+[source,sql]
+----
+-- Aumentar el saldo de las cuentas de los clientes que tienen un saldo mayor a 1000
+UPDATE Cuentas
+SET saldo = saldo * 1.05
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM CtaCli
+    WHERE dniCli IN (
+        SELECT dniCli
+        FROM Clientes
+        WHERE saldo > 1000
+    )
+);
+-- Actualizar el activo de las sucursales según el saldo total de sus cuentas
+UPDATE Sucursales
+SET activo = (
+    SELECT COALESCE(SUM(saldo), 0)
+    FROM Cuentas
+    WHERE Cuentas.nombreSuc = Sucursales.nombreSuc
+);
+----
+
+=== Eliminación de Datos (DELETE)
+
+==== Eliminación Simple
+[source,sql]
+----
+-- Eliminar un cliente específico
+DELETE FROM Clientes
+WHERE dniCli = 10;
+
+-- Eliminar todas las cuentas con saldo cero
+DELETE FROM Cuentas
+WHERE saldo = 0;
+----
+
+==== Eliminación con Subconsultas
+[source,sql]
+----
+-- Eliminar las cuentas de los clientes que no han realizado movimientos en el último año
+DELETE FROM Cuentas
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM CtaCli
+    WHERE dniCli IN (
+        SELECT dniCli
+        FROM Clientes
+        WHERE ultimoMovimiento < date('now', '-1 year')
+    )
+);
+
+-- Eliminar las relaciones cliente-cuenta para cuentas cerradas
+DELETE FROM CtaCli
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM Cuentas
+    WHERE estado = 'CERRADA'
+);
+----
+
+==== Eliminación con JOIN
+[source,sql]
+----
+-- Eliminar todas las cuentas de una sucursal que va a cerrar
+DELETE FROM Cuentas
+WHERE nombreSuc IN (
+    SELECT nombreSuc
+    FROM Sucursales
+    WHERE estado = 'PENDIENTE_CIERRE'
+);
+----
+
+[IMPORTANT]
+====
+Antes de ejecutar operaciones de actualización o eliminación masiva:
+
+1. Realizar una copia de seguridad de los datos
+2. Probar primero la consulta con SELECT para verificar qué registros se verán afectados
+3. Usar transacciones para poder revertir los cambios si algo sale mal
+====
+
+[TIP]
+====
+Para operaciones que afecten a múltiples tablas relacionadas, considerar:
+
+* El orden correcto de las operaciones para mantener la integridad referencial
+* El uso de restricciones ON DELETE CASCADE cuando sea apropiado
+* La posibilidad de usar transacciones para mantener la consistencia
+====

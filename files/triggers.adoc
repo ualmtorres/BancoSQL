@@ -1,0 +1,299 @@
+== Triggers
+
+Los triggers (o disparadores) son objetos de base de datos que se ejecutan automáticamente en respuesta a ciertos eventos sobre una tabla, como inserción (INSERT), actualización (UPDATE) o borrado (DELETE) de registros.
+
+Los triggers permiten implementar lógica de negocio compleja y mantener la integridad de los datos sin necesidad de modificar el código de la aplicación.
+Los triggers se definen en la base de datos y se asocian a una tabla específica. Se pueden utilizar para realizar acciones como:
+* Validar datos antes de insertarlos o actualizarlos
+* Mantener registros de auditoría
+* Actualizar automáticamente otros registros o tablas
+* Enviar notificaciones o alertas
+* Implementar reglas de negocio complejas
+* Realizar cálculos automáticos
+* Sincronizar datos entre tablas
+* Aplicar restricciones adicionales a los datos
+* Realizar acciones en cascada (por ejemplo, eliminar registros relacionados)
+
+Su sintaxis básica es la siguiente:
+
+[source,sql]
+----
+CREATE TRIGGER nombre_trigger
+{BEFORE|AFTER} {INSERT|UPDATE|DELETE}
+ON nombre_tabla
+FOR EACH ROW
+BEGIN
+    -- Lógica del trigger
+END;
+----
+
+=== Descripción de la sintaxis
+
+* `BEFORE`: El trigger se ejecuta antes de que la operación (`INSERT/UPDATE/DELETE`) se realice en la tabla. Es útil para:
+
+    ** Validar o modificar los datos antes de que se guarden
+    ** Realizar comprobaciones de reglas de negocio
+    ** Asignar valores por defecto
+
+* `AFTER`: El trigger se ejecuta después de que la operación se haya completado. Se usa para:
+
+    ** Registrar auditorías
+    ** Actualizar tablas relacionadas
+    ** Enviar notificaciones
+    ** Mantener datos agregados
+
+* `INSTEAD OF`
+
+Este es un tipo especial de trigger disponible principalmente en SQL Server (no en MySQL). Como su nombre indica, se ejecuta en lugar de la operación original.
+
+Como características principales destacan:
+
+* Se utiliza principalmente en vistas
+* Permite realizar operaciones complejas en lugar de la operación original
+* Permite realizar operaciones en múltiples tablas
+* Permite realizar operaciones que normalmente no se pueden hacer directamente en la vista
+
+En definitiva, da control total sobre cómo se procesan las operaciones
+
+* `FOR EACH ROW`: Indica que el trigger se ejecutará para cada fila afectada por la operación. Esto significa que si una operación afecta a múltiples filas, el trigger se ejecutará una vez por cada fila.
+* `FOR EACH STATEMENT`: Indica que el trigger se ejecutará una sola vez para toda la declaración, independientemente de cuántas filas se vean afectadas. Este tipo de trigger es menos común y no está disponible en todos los sistemas de gestión de bases de datos.
+* `NEW` y `OLD`: Son palabras clave que se utilizan para referirse a los valores de las filas afectadas por la operación. `NEW` se refiere a los nuevos valores que se están insertando o actualizando, mientras que `OLD` se refiere a los valores anteriores antes de la operación.
+
+=== Ejemplos Prácticos
+
+==== Ejemplo de actualización de saldo
+
+Con este trigger, cada vez que se inserte un nuevo movimiento en la tabla `Movimientos`, se actualizará automáticamente el saldo de la cuenta correspondiente.
+
+[source,sql]
+----
+-- Trigger para actualizar el saldo de la cuenta después de insertar un movimiento
+DELIMITER //
+
+DROP TRIGGER IF EXISTS ActualizarSaldo //
+CREATE TRIGGER ActualizarSaldo
+AFTER INSERT
+ON Transacciones
+FOR EACH ROW
+BEGIN
+    UPDATE Cuentas
+    SET saldo = saldo + NEW.importe
+    WHERE numeroCta = NEW.numeroCta;
+END //
+
+DELIMITER ;
+----
+
+Este trigger se ejecuta después de que se inserte un nuevo movimiento en la tabla `Transacciones`. Actualiza el saldo de la cuenta correspondiente sumando el importe del movimiento.
+* `AFTER INSERT`: Indica que el trigger se ejecutará después de que se inserte un nuevo movimiento.
+* El uso de `NEW.importe` permite acceder al valor del importe del nuevo movimiento que se está insertando.
+
+Para probarlo, consultar el saldo de la cuenta `100`, insertar un nuevo movimiento y volver a consultar el saldo:
+
+[source,sql]
+----
+-- Consultar el saldo de la cuenta antes de insertar un movimiento
+SELECT saldo
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 1, NOW(), 100.00);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debería haber aumentado en 100.00
+SELECT saldo
+FROM Cuentas
+WHERE numeroCta = 100;
+----
+
+==== Ejemplo de gestión de descubiertos
+
+Para la gestión de descubiertos, se van a crear dos tablas: una de `Descubiertos` que almacenará los descubiertos de las cuentas, y otra de `Notificaciones` que almacenará las notificaciones enviadas a los clientes.
+
+La tabla `Descubiertos` tendrá las siguientes columnas:
+
+* `numeroCta`: Número de cuenta en descubierto
+* `fecha`: Fecha en la que se detectó el descubierto
+* `importe`: Importe del descubierto
+* `estado`: Estado del descubierto (pendiente, resuelto, etc.)
+
+La tabla `Notificaciones` tendrá las siguientes columnas:
+
+* `numeroCta`: Número de cuenta notificada
+* `fecha`: Fecha de la notificación
+* `mensaje`: Mensaje de la notificación
+* `estado`: Estado de la notificación (enviada, no enviada, etc.)
+
+Para gestionar los descubiertos, se va a crear un trigger que se activará después de cada actualización en la tabla `Cuentas`. Este trigger verificará si el saldo de la cuenta ha caído por debajo de cero y, en caso afirmativo, insertará un registro en la tabla `Descubiertos` y un registro en la tabla `Notificaciones`.
+
+Comencemos creando las tablas:
+
+[source,sql]
+----
+-- Crear las tablas Descubiertos y Notificaciones
+DROP TABLE IF EXISTS Descubiertos;
+DROP TABLE IF EXISTS Notificaciones;
+
+CREATE TABLE Descubiertos (
+    numeroCta VARCHAR(20),
+    fecha DATE,
+    importe DECIMAL(10, 2),
+    estado ENUM('PENDIENTE', 'RESUELTO')
+);
+CREATE TABLE Notificaciones (
+    numeroCta tinyint(4),
+    fecha DATE,
+    mensaje VARCHAR(255),
+    estado ENUM('ENVIADA', 'NO_ENVIADA')
+);
+----
+
+A continuación, creamos el trigger:
+
+[source,sql]
+----
+-- Trigger para gestionar los descubiertos de las cuentas
+-- y enviar notificaciones a los clientes
+-- cuando el saldo de la cuenta es negativo
+DELIMITER //
+
+CREATE TRIGGER GestionarDescubiertos
+AFTER UPDATE
+ON Cuentas
+FOR EACH ROW
+BEGIN
+    IF NEW.saldo < 0 THEN
+        INSERT INTO Descubiertos (numeroCta, fecha, importe, estado)
+        VALUES (NEW.numeroCta, NOW(), -NEW.saldo, 'PENDIENTE');
+        
+        INSERT INTO Notificaciones (numeroCta, fecha, mensaje, estado)
+        VALUES (NEW.numeroCta, NOW(), 'Se ha detectado un descubierto en su cuenta de ' || -NEW.saldo, 'ENVIADA');
+    END IF;
+END //
+
+DELIMITER ;
+----
+
+Este trigger se ejecuta después de cada actualización en la tabla `Cuentas`. Si el saldo de la cuenta cae por debajo de cero, se inserta un registro en la tabla `Descubiertos` y otro en la tabla `Notificaciones`, indicando que se ha detectado un descubierto y que se ha enviado una notificación al cliente.
+
+* El uso de `NEW.saldo` permite acceder al nuevo saldo de la cuenta después de la actualización. La función `NOW()` se utiliza para obtener la fecha y hora actuales.
+
+* El uso de `-NEW.saldo` permite calcular el importe del descubierto, que es el saldo negativo de la cuenta.
+
+* El uso de `||` permite concatenar cadenas de texto en SQL. En este caso, se utiliza para crear el mensaje de la notificación.
+
+* El uso de `IF` permite ejecutar una acción condicionalmente, en este caso, solo si el saldo es negativo.
+
+
+==== Revisión del trigger de actualización de saldo
+
+Anteriormente, se ha creado un trigger que actualiza el saldo de la cuenta después de cada inserción en la tabla `Transacciones`. Por otro lado, se ha creado otro trigger que gestiona los descubiertos de las cuentas después de cada actualización en la tabla `Cuentas` y anota los descubiertos en la tabla `Descubiertos` y las notificaciones en la tabla `Notificaciones`. En cuanto una cuenta en descubierto vuelve a estar en positivo, se debe actualizar el estado del descubierto a "RESUELTO". A continuación se muestra el código modificado para el trigger de actualización de saldo:
+
+[source,sql]
+----
+-- Trigger para actualizar el saldo de la cuenta después de insertar un movimiento
+-- y gestionar los descubiertos
+-- y enviar notificaciones a los clientes
+-- cuando el saldo de la cuenta es negativo
+-- y actualizar el estado del descubierto a "RESUELTO" cuando el saldo es positivo
+-- y el saldo anterior era negativo
+
+DELIMITER //
+
+DROP TRIGGER IF EXISTS ActualizarSaldo //
+CREATE TRIGGER ActualizarSaldo
+AFTER INSERT
+ON Transacciones
+FOR EACH ROW
+BEGIN
+    DECLARE saldo_anterior DECIMAL(10, 2);
+    DECLARE nuevo_saldo DECIMAL(10, 2);
+
+    -- Obtener el saldo anterior de la cuenta
+    SELECT saldo INTO saldo_anterior
+    FROM Cuentas
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Actualizar el saldo de la cuenta
+    UPDATE Cuentas
+    SET saldo = saldo + NEW.importe
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Obtener el nuevo saldo de la cuenta
+    SELECT saldo INTO nuevo_saldo
+    FROM Cuentas
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Verificar si el saldo anterior era negativo y el nuevo saldo es positivo
+    IF saldo_anterior < 0 AND nuevo_saldo >= 0 THEN
+        -- Actualizar el estado del descubierto a "RESUELTO"
+        UPDATE Descubiertos
+        SET estado = 'RESUELTO'
+        WHERE numeroCta = NEW.numeroCta
+        AND estado = 'PENDIENTE';
+    END IF;
+END //
+
+DELIMITER ;
+----
+
+Este trigger se ejecuta después de cada inserción en la tabla `Transacciones`. Primero, obtiene el saldo anterior de la cuenta antes de actualizarlo. Luego, actualiza el saldo de la cuenta y verifica si el saldo anterior era negativo y el nuevo saldo es positivo. Si es así, actualiza el estado del descubierto a "RESUELTO" en la tabla `Descubiertos`.
+
+El uso de `saldo_anterior` permite almacenar el saldo antes de la actualización y utilizarlo para verificar si el saldo ha cambiado de negativo a positivo. Esto asegura que solo se actualice el estado del descubierto si la cuenta ha pasado de estar en descubierto a estar en positivo.
+
+Para probarlo, se puede insertar un nuevo movimiento en la tabla `Transacciones` y verificar el estado del descubierto en la tabla `Descubiertos`:
+
+[source,sql]
+----
+-- Consultar el saldo de la cuenta antes de insertar un movimiento
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+-- que reduce el saldo de la cuenta a negativo
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 2, NOW(), -800);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debe ser negativo
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Consultar el estado del descubierto después de insertar el movimiento
+-- Debe haber un nuevo registro en la tabla Descubiertos
+-- y el estado debe ser "PENDIENTE"
+SELECT *
+FROM Descubiertos
+WHERE numeroCta = 100;
+
+-- Consultar el estado de las notificaciones
+-- Debe haber un nuevo registro en la tabla Notificaciones
+-- y el estado debe ser "ENVIADA"
+SELECT *
+FROM Notificaciones
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+-- que convierte el saldo de la cuenta a positivo
+-- y actualiza el estado del descubierto a "RESUELTO"
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 3, NOW(), 500);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debe ser positivo
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Consultar el estado del descubierto después de insertar el movimiento
+-- El estado debe ser "RESUELTO"
+SELECT *
+FROM Descubiertos
+WHERE numeroCta = 100;
+----
+
+Este conjunto de consultas permite verificar el estado del descubierto antes y después de insertar un nuevo movimiento en la tabla `Transacciones`. Se puede observar cómo el estado del descubierto cambia de "PENDIENTE" a "RESUELTO" cuando el saldo de la cuenta pasa de negativo a positivo.

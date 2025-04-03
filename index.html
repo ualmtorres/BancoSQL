@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.22">
 <meta name="author" content="Bases de datos. Ingeniería Informática. Manuel Torres &lt;mtorres@ual.es&gt;">
-<title>Aprendiendo SQL con la base de datos Banco</title>
+<title>Aprendiendo SQL con una base de datos bancaria</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -439,7 +439,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-right">
 <div id="header">
-<h1>Aprendiendo SQL con la base de datos Banco</h1>
+<h1>Aprendiendo SQL con una base de datos bancaria</h1>
 <div class="details">
 <span id="author" class="author">Bases de datos. Ingeniería Informática. Manuel Torres &lt;mtorres@ual.es&gt;</span><br>
 </div>
@@ -468,6 +468,34 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_vistas">2.16. Vistas</a></li>
 </ul>
 </li>
+<li><a href="#_operaciones_dml_sobre_la_base_de_datos_banco">3. Operaciones DML sobre la Base de Datos Banco</a>
+<ul class="sectlevel2">
+<li><a href="#_inserción_de_datos_insert">3.1. Inserción de Datos (INSERT)</a></li>
+<li><a href="#_actualización_de_datos_update">3.2. Actualización de Datos (UPDATE)</a></li>
+<li><a href="#_eliminación_de_datos_delete">3.3. Eliminación de Datos (DELETE)</a></li>
+</ul>
+</li>
+<li><a href="#_procedimientos_almacenados">4. Procedimientos almacenados</a>
+<ul class="sectlevel2">
+<li><a href="#_ventajas_de_los_procedimientos_almacenados">4.1. Ventajas de los procedimientos almacenados</a></li>
+<li><a href="#_estructura_básica">4.2. Estructura básica</a></li>
+<li><a href="#_parámetros">4.3. Parámetros</a></li>
+<li><a href="#_declaración_de_variables">4.4. Declaración de variables</a></li>
+<li><a href="#_control_de_flujo">4.5. Control de flujo</a></li>
+<li><a href="#_delimiter">4.6. <code>DELIMITER</code></a></li>
+<li><a href="#_manejo_de_errores">4.7. Manejo de errores</a></li>
+<li><a href="#_ejemplo_de_llamada_a_un_procedimiento">4.8. Ejemplo de llamada a un procedimiento</a></li>
+<li><a href="#_la_importancia_del_select_into">4.9. La importancia del <code>SELECT INTO</code></a></li>
+<li><a href="#_ejemplos_de_procedimientos_almacenados">4.10. Ejemplos de procedimientos almacenados</a></li>
+</ul>
+</li>
+<li><a href="#_triggers">5. Triggers</a>
+<ul class="sectlevel2">
+<li><a href="#_descripción_de_la_sintaxis">5.1. Descripción de la sintaxis</a></li>
+<li><a href="#_ejemplos_prácticos">5.2. Ejemplos Prácticos</a></li>
+</ul>
+</li>
+<li><a href="#_licencia">Licencia</a></li>
 </ul>
 </div>
 </div>
@@ -485,24 +513,51 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_resumen">Resumen</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>En este documento se presentan diferentes consultas SQL sobre una base de datos de un banco, mostrando distintas técnicas y operadores del lenguaje SQL.</p>
+<p>Este tutorial está diseñado para introducir y profundizar en el uso del lenguaje SQL mediante el análisis y la práctica con una base de datos bancaria. A lo largo del tutorial se exploran conceptos fundamentales y avanzados del manejo de bases de datos relacionales, utilizando ejemplos prácticos y casos reales.</p>
 </div>
 <div class="ulist">
 <div class="title">Objetivos</div>
 <ul>
 <li>
-<p>Aprender a realizar consultas SQL básicas y avanzadas</p>
+<p>Aprender a realizar consultas SQL básicas y avanzadas.</p>
 </li>
 <li>
-<p>Comprender el uso de diferentes operadores SQL</p>
+<p>Comprender el uso de operadores SQL y su aplicación en diferentes escenarios.</p>
 </li>
 <li>
-<p>Entender las distintas formas de unir tablas</p>
+<p>Explorar las distintas formas de combinar tablas, como <code>INNER JOIN</code>, <code>LEFT JOIN</code> y <code>CROSS JOIN</code>.</p>
 </li>
 <li>
-<p>Practicar con casos reales de una base de datos bancaria</p>
+<p>Practicar con subconsultas, vistas, procedimientos almacenados y triggers para resolver problemas complejos.</p>
+</li>
+<li>
+<p>Aplicar técnicas de manipulación de datos (DML) como inserciones, actualizaciones y eliminaciones.</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Disponibles:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/ualmtorres/SampleDatabases/blob/master/BancoMySQL.sql">Script de creación de la base de datos</a></p>
+</li>
+<li>
+<p><a href="https://github.com/ualmtorres/BancoSQL/blob/gh-pages/consultas.sql">Script de consultas</a></p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -529,7 +584,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
-FROM    Clientes</code></pre>
+FROM    Clientes;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -567,7 +622,7 @@ FROM    Clientes</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombrecli, domicilio
-FROM    Clientes</code></pre>
+FROM    Clientes;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -608,7 +663,7 @@ FROM    Clientes</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT DISTINCT(nombresuc)
-FROM Empleados</code></pre>
+FROM Empleados;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -624,7 +679,7 @@ FROM Empleados</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombreemp, dniemp
 FROM    Empleados
-WHERE   nombresuc = 'Downtown'</code></pre>
+WHERE   nombresuc = 'Downtown';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -665,7 +720,7 @@ WHERE   nombresuc = 'Downtown'</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  numerocta, saldo
 FROM    Cuentas
 WHERE   nombresuc = 'Perrydge'
-        AND saldo &gt; 35000</code></pre>
+        AND saldo &gt; 35000;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -723,7 +778,7 @@ WHERE   nombresuc = 'Perrydge'
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT *
 FROM Empleados
 WHERE nombresuc = 'Downtown'
-OR nombresuc = 'Perrydge'</code></pre>
+OR nombresuc = 'Perrydge';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -736,7 +791,7 @@ OR nombresuc = 'Perrydge'</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Empleados
-WHERE   nombresuc IN ('Downtown', 'Perrydge')</code></pre>
+WHERE   nombresuc IN ('Downtown', 'Perrydge');</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -772,7 +827,7 @@ WHERE   nombresuc IN ('Downtown', 'Perrydge')</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Cuentas
 WHERE   saldo &gt;= 20000
-        AND saldo &lt;= 40000</code></pre>
+        AND saldo &lt;= 40000;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -782,7 +837,7 @@ WHERE   saldo &gt;= 20000
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Cuentas
-WHERE   saldo BETWEEN 20000 AND 40000</code></pre>
+WHERE   saldo BETWEEN 20000 AND 40000;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -820,7 +875,7 @@ WHERE   saldo BETWEEN 20000 AND 40000</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Clientes
-WHERE   domicilio LIKE 'Fragata%'</code></pre>
+WHERE   domicilio LIKE 'Fragata%';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -870,6 +925,14 @@ WHERE   domicilio LIKE 'Fragata%'</code></pre>
 <div class="paragraph">
 <p>Otra forma de buscar patrones es utilizando <code>%</code> al principio y al final del patrón. Por ejemplo, para obtener todas las direcciones que contienen la palabra "Azul", escribiríamos <code>LIKE '%Azul%'</code>.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Mostrar las filas de los clientes que su domicilio contenga Azul
+SELECT	*
+FROM	Clientes
+WHERE	domicilio LIKE '%Azul%'</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>Además del comodín <code>%</code>, también podemos usar el comodín <code>_</code> para representar un solo carácter. Por ejemplo, <code>LIKE 'Fragata _'</code> coincidiría con "Fragata A", "Fragata B", pero no con "Fragata AB".</p>
 </div>
@@ -883,7 +946,7 @@ WHERE   domicilio LIKE 'Fragata%'</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Cuentas
-ORDER BY nombresuc, saldo DESC</code></pre>
+ORDER BY nombresuc, saldo DESC;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -933,7 +996,7 @@ ORDER BY nombresuc, saldo DESC</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc, activo
 FROM    Sucursales
 ORDER BY activo DESC
-LIMIT 3</code></pre>
+LIMIT 3;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -957,7 +1020,7 @@ LIMIT 3</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc, activo
 FROM    Sucursales
 ORDER BY activo DESC
-LIMIT 3 OFFSET 2</code></pre>
+LIMIT 3 OFFSET 2;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -995,7 +1058,7 @@ FROM    Clientes,
         Cuentas
 WHERE   Clientes.dniCli = CtaCli.dniCli
         AND CtaCli.numeroCta = Cuentas.numeroCta
-        AND nombrecli = 'Johnson'</code></pre>
+        AND nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1061,7 +1124,7 @@ WHERE   Clientes.dniCli = CtaCli.dniCli
 FROM    Sucursales,
         Empleados
 WHERE   Sucursales.nombreSuc = Empleados.nombreSuc
-        AND Empleados.nombreEmp = 'Smith'</code></pre>
+        AND Empleados.nombreEmp = 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1081,7 +1144,7 @@ FROM    Clientes Cl,
         Cuentas Cu
 WHERE   Cl.dniCli = CC.dniCli
         AND CC.numeroCta = Cu.numeroCta
-        AND Cl.nombrecli = 'Johnson'</code></pre>
+        AND Cl.nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1093,7 +1156,7 @@ WHERE   Cl.dniCli = CC.dniCli
 FROM    Clientes Cl
         INNER JOIN CtaCli CC ON Cl.dniCli = CC.dniCli
         INNER JOIN Cuentas Cu ON CC.numeroCta = Cu.numeroCta
-WHERE   Cl.nombrecli = 'Johnson'</code></pre>
+WHERE   Cl.nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1114,7 +1177,7 @@ WHERE   Cl.nombrecli = 'Johnson'</code></pre>
 FROM    Sucursales
         CROSS JOIN Empleados
 WHERE   Sucursales.nombreSuc = Empleados.nombreSuc
-        AND Empleados.nombreEmp = 'Smith'</code></pre>
+        AND Empleados.nombreEmp = 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1126,7 +1189,7 @@ WHERE   Sucursales.nombreSuc = Empleados.nombreSuc
 FROM    Sucursales
         CROSS JOIN Cuentas
 WHERE   Sucursales.nombreSuc = Cuentas.nombreSuc
-        AND ciudadsuc = 'Horseneck'</code></pre>
+        AND ciudadsuc = 'Horseneck';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1141,7 +1204,7 @@ WHERE   Sucursales.nombreSuc = Cuentas.nombreSuc
 FROM    Clientes
         INNER JOIN CtaCli ON Clientes.dniCli = CtaCli.dniCli
         INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
-WHERE   nombrecli = 'Johnson'</code></pre>
+WHERE   nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1197,7 +1260,7 @@ WHERE   nombrecli = 'Johnson'</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  ciudadsuc
 FROM    Sucursales
         INNER JOIN Empleados ON Sucursales.nombreSuc = Empleados.nombreSuc
-WHERE   Empleados.nombreEmp = 'Smith'</code></pre>
+WHERE   Empleados.nombreEmp = 'Smith';</code></pre>
 </div>
 </div>
 </div>
@@ -1209,7 +1272,7 @@ WHERE   Empleados.nombreEmp = 'Smith'</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  Cuentas.*, saldo * 1.08 AS saldoEnDolares
-FROM    Cuentas</code></pre>
+FROM    Cuentas;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1268,7 +1331,7 @@ FROM    Cuentas</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  numerocta, saldo
 FROM    Cuentas
 WHERE   nombresuc = 'Perrydge'
-        AND saldo &gt; 35000/1.08</code></pre>
+        AND saldo &gt; 35000/1.08;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1298,7 +1361,7 @@ WHERE   nombresuc = 'Perrydge'
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  numerocta, saldo, saldo * 1.08 AS saldoEnDolares
 FROM    Cuentas
 WHERE   nombresuc = 'Perrydge'
-        AND saldo &gt; 35000/1.08</code></pre>
+        AND saldo &gt; 35000/1.08;</code></pre>
 </div>
 </div>
 </div>
@@ -1310,10 +1373,10 @@ WHERE   nombresuc = 'Perrydge'
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombreEmp
-FROM    empleados
+FROM    Empleados
 UNION
 SELECT  nombreCli
-FROM    clientes</code></pre>
+FROM    Clientes;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1368,7 +1431,7 @@ FROM    clientes</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  *
 FROM    Sucursales
         LEFT JOIN Cuentas ON Sucursales.nombreSuc = Cuentas.nombreSuc
-WHERE   ciudadsuc = 'Horseneck'</code></pre>
+WHERE   ciudadsuc = 'Horseneck';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1426,7 +1489,7 @@ WHERE   nombresuc IN (
     SELECT nombresuc
     FROM Empleados
     WHERE nombreemp = 'Smith'
-)</code></pre>
+);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1442,7 +1505,7 @@ WHERE   nombresuc IN (
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc
 FROM    Empleados
-WHERE   nombreemp = 'Smith'</code></pre>
+WHERE   nombreemp = 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1502,7 +1565,7 @@ WHERE   nombresuc IN (...)</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  DISTINCT E1.nombreemp
 FROM    Empleados E1
         INNER JOIN Empleados E2 ON E1.nombresuc = E2.nombresuc
-WHERE   E2.nombreemp = 'Smith'</code></pre>
+WHERE   E2.nombreemp = 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1517,11 +1580,10 @@ WHERE   E2.nombreemp = 'Smith'</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombreemp
-FROM    Empleados,
-        (SELECT nombresuc
+FROM    (SELECT nombresuc
           FROM   Empleados
           WHERE  nombreemp = 'Smith') AS SucursalDeSmith
-        INNER JOIN Empleados ON Empleados.nombresuc = SucursalDeSmith.nombresuc</code></pre>
+        INNER JOIN Empleados ON Empleados.nombresuc = SucursalDeSmith.nombresuc;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1538,7 +1600,7 @@ FROM    Empleados,
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc
 FROM    Empleados
-WHERE   nombreemp = 'Smith'</code></pre>
+WHERE   nombreemp = 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1554,11 +1616,10 @@ WHERE   nombreemp = 'Smith'</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombreemp
-FROM    Empleados,
-        (SELECT nombresuc
+FROM    (SELECT nombresuc
           FROM   Empleados
           WHERE  nombreemp = 'Smith') AS SucursalDeSmith
-        INNER JOIN Empleados ON Empleados.nombresuc = SucursalDeSmith.nombresuc</code></pre>
+        INNER JOIN Empleados ON Empleados.nombresuc = SucursalDeSmith.nombresuc;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1583,12 +1644,11 @@ FROM    Empleados,
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombreemp
-FROM    Empleados,
-        (SELECT nombresuc
+FROM    (SELECT nombresuc
           FROM   Empleados
           WHERE  nombreemp = 'Smith') AS SucursalDeSmith
         INNER JOIN Empleados ON Empleados.nombresuc = SucursalDeSmith.nombresuc
-WHERE   nombreemp &lt;&gt; 'Smith'</code></pre>
+WHERE   nombreemp &lt;&gt; 'Smith';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1609,7 +1669,7 @@ Esta consulta es útil para obtener una lista de empleados que trabajan en la mi
                     WHERE       Clientes.dniCli = CC.dniCli
                     ORDER BY    saldo DESC
                     LIMIT 1)
-FROM Clientes</code></pre>
+FROM Clientes;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1685,7 +1745,7 @@ LIMIT 1</pre>
                     WHERE       Clientes.dniCli = CC.dniCli
                     ORDER BY    saldo DESC
                     LIMIT 1) AS datosMejorCuenta
-FROM Clientes</code></pre>
+FROM Clientes;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1699,7 +1759,7 @@ FROM Clientes</code></pre>
                     WHERE       Clientes.dniCli = CC.dniCli
                     ORDER BY    saldo DESC
                     LIMIT 1) AS datosMejorCuenta
-FROM Clientes</code></pre>
+FROM Clientes;</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1715,6 +1775,23 @@ FROM Clientes</code></pre>
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>Otra forma de obtener el mismo resultado sería usar una subconsulta en la cláusula <code>FROM</code> y luego hacer un <code>JOIN</code> con la tabla <code>Cuentas</code>. La dos consultas más internas se encargan de obtener para cada cliente su cuenta con mayor saldo. Para enriquecer ese resultado con nuevas columnas, se hace un <code>JOIN</code> con la tabla <code>Cuentas</code> para obtener el saldo y la sucursal a la que pertenece. La consulta sería la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT	Cuentas.numeroCta, Cuentas.saldo, Cuentas.nombreSuc, Aux.nombrecli
+FROM  (SELECT nombrecli, ( SELECT      Cu.numerocta
+                            FROM	Cuentas Cu
+                                        INNER JOIN CtaCli CC ON Cu.numeroCta = CC.numeroCta
+                            WHERE       Clientes.dniCli = CC.dniCli
+                            ORDER BY    saldo DESC
+                            LIMIT 1) as mejorCuenta
+        FROM Clientes) Aux,
+        Cuentas
+WHERE	Aux.mejorCuenta = Cuentas.numeroCta;</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1736,7 +1813,7 @@ FROM Clientes</code></pre>
 FROM    Sucursales
 WHERE   EXISTS (SELECT  *
                 FROM    Empleados
-                WHERE   Sucursales.nombresuc = Empleados.nombresuc)</code></pre>
+                WHERE   Sucursales.nombresuc = Empleados.nombresuc);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1762,7 +1839,7 @@ WHERE   EXISTS (SELECT  *
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  DISTINCT(nombreSuc)
-FROM    Empleados</code></pre>
+FROM    Empleados;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1774,7 +1851,7 @@ FROM    Empleados</code></pre>
 FROM    Sucursales
 WHERE   NOT EXISTS (SELECT  *
                     FROM    Empleados
-                    WHERE   Sucursales.nombresuc = Empleados.nombresuc)</code></pre>
+                    WHERE   Sucursales.nombresuc = Empleados.nombresuc);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1802,7 +1879,7 @@ WHERE   NOT EXISTS (SELECT  *
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  Sucursales.nombresuc
 FROM    Sucursales
         LEFT JOIN Empleados ON Sucursales.nombresuc = Empleados.nombresuc
-WHERE   Empleados.nombresuc IS NULL</code></pre>
+WHERE   Empleados.nombresuc IS NULL;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1813,7 +1890,7 @@ WHERE   Empleados.nombresuc IS NULL</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc
 FROM    Sucursales
 WHERE   nombresuc NOT IN (SELECT  nombresuc
-                          FROM    Empleados)</code></pre>
+                          FROM    Empleados);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1836,7 +1913,7 @@ WHERE   saldo &gt; ALL (SELECT saldo
                     FROM    Cuentas
                             INNER JOIN CtaCli ON Cuentas.numeroCta = CtaCli.numeroCta
                             INNER JOIN Clientes ON CtaCli.dniCli = Clientes.dniCli
-                    WHERE nombreemp = 'Smith')</pre>
+                    WHERE nombreCli = 'Smith');</pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1870,7 +1947,7 @@ WHERE   saldo &gt; ANY (SELECT saldo
                     FROM    Cuentas
                             INNER JOIN CtaCli ON Cuentas.numeroCta = CtaCli.numeroCta
                             INNER JOIN Clientes ON CtaCli.dniCli = Clientes.dniCli
-                    WHERE nombreemp = 'Smith')</code></pre>
+                    WHERE nombreCli = 'Smith');</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1923,7 +2000,7 @@ WHERE   saldo &gt; ANY (SELECT saldo
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  COUNT(*) AS numEmpleados
-FROM    Empleados</code></pre>
+FROM    Empleados;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1961,7 +2038,7 @@ FROM    Empleados</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  COUNT(*) AS numEmpleados
 FROM    Empleados
-WHERE   nombresuc = 'Downtown'</code></pre>
+WHERE   nombresuc = 'Downtown';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1992,7 +2069,7 @@ WHERE   nombresuc = 'Downtown'</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  COUNT(DISTINCT nombresuc) AS numSucursales
-FROM    Empleados</code></pre>
+FROM    Empleados;</code></pre>
 </div>
 </div>
 </div>
@@ -2007,7 +2084,7 @@ FROM    Empleados</code></pre>
 FROM    Cuentas
         INNER JOIN CtaCli ON Cuentas.numeroCta = CtaCli.numeroCta
         INNER JOIN Clientes ON CtaCli.dniCli = Clientes.dniCli
-WHERE   nombrecli = 'Johnson'</code></pre>
+WHERE   nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2054,7 +2131,7 @@ WHERE   nombrecli = 'Johnson'</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  AVG(saldo) AS saldoMedio
 FROM    Cuentas
-WHERE   nombreSuc = 'Downtown'</code></pre>
+WHERE   nombreSuc = 'Downtown';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2092,7 +2169,7 @@ WHERE   nombreSuc = 'Downtown'</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  MAX(saldo) AS saldoMaximo
 FROM    Cuentas
-WHERE   nombreSuc = 'Downtown'</code></pre>
+WHERE   nombreSuc = 'Downtown';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2129,7 +2206,7 @@ WHERE   nombreSuc = 'Downtown'</code></pre>
 FROM    Cuentas
         INNER JOIN CtaCli ON Cuentas.numeroCta = CtaCli.numeroCta
         INNER JOIN Clientes ON CtaCli.dniCli = Clientes.dniCli
-WHERE   nombrecli = 'Johnson'</code></pre>
+WHERE   nombrecli = 'Johnson';</code></pre>
 </div>
 </div>
 </div>
@@ -2148,7 +2225,7 @@ WHERE   saldo &gt; (SELECT AVG(saldo)
                  FROM    Cuentas
                          INNER JOIN CtaCli ON Cuentas.numeroCta = CtaCli.numeroCta
                          INNER JOIN Clientes ON CtaCli.dniCli = Clientes.dniCli
-                 WHERE nombrecli = 'Johnson')</code></pre>
+                 WHERE nombrecli = 'Johnson');</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2179,7 +2256,7 @@ WHERE   saldo &gt; (SELECT AVG(saldo)
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc, SUM(saldo) AS saldoTotal
 FROM    Cuentas
-GROUP BY nombresuc</code></pre>
+GROUP BY nombresuc;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2215,11 +2292,11 @@ GROUP BY nombresuc</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc, SUM(saldo) AS saldoTotal
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  Sucursales.nombresuc, SUM(saldo) AS saldoTotal
 FROM    Cuentas
         INNER JOIN Sucursales ON Cuentas.nombresuc = Sucursales.nombresuc
 WHERE   ciudadsuc = 'Brooklyn'
-GROUP BY nombresuc</code></pre>
+GROUP BY Sucursales.nombresuc;</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -2258,7 +2335,7 @@ GROUP BY nombresuc</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  ciudadsuc, COUNT(*) AS numEmpleados
 FROM    Empleados
         INNER JOIN Sucursales ON Empleados.nombresuc = Sucursales.nombresuc
-GROUP BY ciudadsuc</code></pre>
+GROUP BY ciudadsuc;</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -2295,7 +2372,7 @@ GROUP BY ciudadsuc</code></pre>
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  ciudadsuc, COUNT(Empleados.dniEmp) AS numEmpleados
 FROM    Sucursales
         LEFT JOIN Empleados ON Sucursales.nombresuc = Empleados.nombresuc
-GROUP BY ciudadsuc</code></pre>
+GROUP BY ciudadsuc;</code></pre>
 </div>
 </div>
 <div class="admonitionblock warning">
@@ -2347,7 +2424,7 @@ GROUP BY ciudadsuc</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT  nombresuc, GROUP_CONCAT(nombreemp) AS empleados
 FROM    Empleados
-GROUP BY nombresuc</code></pre>
+GROUP BY nombresuc;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2365,7 +2442,7 @@ GROUP BY nombresuc</code></pre>
 FROM    Clientes
         INNER JOIN CtaCli ON Clientes.dniCli = CtaCli.dniCli
         INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
-GROUP BY nombrecli</code></pre>
+GROUP BY nombrecli;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2382,7 +2459,7 @@ GROUP BY nombrecli</code></pre>
          WHERE   Clientes.dniCli = CtaCli.dniCli) AS nombrecli
 FROM    CtaCli
         INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
-GROUP BY dnicli</code></pre>
+GROUP BY dnicli;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2399,7 +2476,7 @@ FROM    CtaCli
         INNER JOIN (SELECT dniCli, nombrecli
                    FROM   Clientes) AS Cl
         ON CtaCli.dniCli = Cl.dniCli
-GROUP BY CtaCli.dnicli</code></pre>
+GROUP BY CtaCli.dnicli;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2432,7 +2509,7 @@ GROUP BY CtaCli.dnicli</code></pre>
 FROM    Cuentas
 WHERE   saldo &gt; 10000
 GROUP BY nombresuc
-HAVING numCuentas &gt; 1</code></pre>
+HAVING numCuentas &gt; 1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2470,7 +2547,7 @@ FROM    CtaCli
         INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
 WHERE   saldo &gt; 10000
 GROUP BY dniCli
-HAVING numCuentas &gt; 1</code></pre>
+HAVING numCuentas &gt; 1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2489,7 +2566,7 @@ FROM    CtaCli
         INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
 WHERE   saldo &gt; 10000
 GROUP BY dnicli
-HAVING numCuentas &gt; 1</code></pre>
+HAVING numCuentas &gt; 1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2505,7 +2582,7 @@ FROM    CtaCli
         ON CtaCli.dniCli = Cl.dniCli
 WHERE   saldo &gt; 10000
 GROUP BY CtaCli.dnicli
-HAVING numCuentas &gt; 1</code></pre>
+HAVING numCuentas &gt; 1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2520,7 +2597,7 @@ WHERE   saldo &gt; 10000
 GROUP BY dniCli
 HAVING numCuentas &gt; 0
 ORDER BY saldoTotal DESC
-LIMIT 3</code></pre>
+LIMIT 3;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2541,7 +2618,7 @@ WHERE   saldo &gt; 10000
 GROUP BY CtaCli.dnicli
 HAVING numCuentas &gt; 0
 ORDER BY saldoTotal DESC
-LIMIT 3</code></pre>
+LIMIT 3;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2560,7 +2637,7 @@ HAVING numCuentas &gt; (SELECT AVG(numCuentas)
                       FROM    (SELECT dniCli, COUNT(*) AS numCuentas
                                FROM    CtaCli
                                        INNER JOIN Cuentas ON CtaCli.numeroCta = Cuentas.numeroCta
-                               GROUP BY dniCli) AS subquery)</code></pre>
+                               GROUP BY dniCli) AS subquery);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2615,7 +2692,7 @@ SELECT  Cu.numerocta, Cu.saldo, Cu.nombresuc,
         Cl.nombrecli, Cl.dnicli
 FROM    Cuentas Cu
         INNER JOIN CtaCli CC ON Cu.numeroCta = CC.numeroCta
-        INNER JOIN Clientes Cl ON CC.dniCli = Cl.dniCli</code></pre>
+        INNER JOIN Clientes Cl ON CC.dniCli = Cl.dniCli;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2637,7 +2714,7 @@ SELECT  S.nombresuc,
 FROM    Sucursales S
         LEFT JOIN Empleados E ON S.nombresuc = E.nombresuc
         LEFT JOIN Cuentas C ON S.nombresuc = C.nombresuc
-GROUP BY S.nombresuc</code></pre>
+GROUP BY S.nombresuc;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2662,7 +2739,7 @@ GROUP BY Cl.dnicli
 HAVING SUM(Cu.saldo) &gt; (SELECT AVG(saldo_total)
                        FROM (SELECT SUM(saldo) as saldo_total
                              FROM Cuentas
-                             GROUP BY nombresuc) T)</code></pre>
+                             GROUP BY nombresuc) T);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2676,17 +2753,17 @@ HAVING SUM(Cu.saldo) &gt; (SELECT AVG(saldo_total)
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Consultar información de todas las cuentas
 SELECT *
 FROM InfoCuentas
-WHERE saldo &gt; 50000
+WHERE saldo &gt; 50000;
 
 -- Obtener estadísticas de sucursales en una ciudad específica
 SELECT *
 FROM EstadisticasSucursales
-WHERE ciudadsuc = 'Brooklyn'
+WHERE ciudadsuc = 'Brooklyn';
 
 -- Listar clientes VIP ordenados por saldo total
 SELECT *
 FROM ClientesVIP
-ORDER BY saldo_total DESC</code></pre>
+ORDER BY saldo_total DESC;</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -2707,10 +2784,1072 @@ ORDER BY saldo_total DESC</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_operaciones_dml_sobre_la_base_de_datos_banco">3. Operaciones DML sobre la Base de Datos Banco</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_inserción_de_datos_insert">3.1. Inserción de Datos (INSERT)</h3>
+<div class="sect3">
+<h4 id="_inserción_simple">3.1.1. Inserción Simple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Insertar un nuevo cliente con nombre y domicilio
+-- (el resto de campos se completan automáticamente)
+INSERT INTO Clientes
+VALUES ('Ana García', 10, 'Calle Mayor 123');
+
+-- Insertar una nueva sucursal
+INSERT INTO Sucursales
+VALUES ('Central', 'Madrid', 1000000);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_inserción_múltiple">3.1.2. Inserción Múltiple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Insertar varios empleados a la vez, pero sin especificar el telefono
+INSERT INTO Empleados (dniEmp, nombreEmp, nombreSuc)
+VALUES
+    ('16', 'Juan Pérez', 'Central'),
+    ('17', 'María López', 'Central'),
+    ('18', 'Pedro García', 'Central');
+
+-- Insertar varias cuentas
+INSERT INTO Cuentas
+VALUES
+    (10, 50000, 'Central'),
+    (11, 75000, 'Central'),
+    (12, 90000, 'Central');</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_inserción_basada_en_consultas">3.1.3. Inserción basada en consultas</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Crear cuentas para todos los empleados de la sucursal Central
+INSERT INTO Cuentas
+SELECT
+    dniEmp + 100,    -- Número de cuenta creado a partir del dni
+    50000,          -- Saldo inicial
+    nombreSuc       -- Misma sucursal donde trabaja
+FROM Empleados
+WHERE nombreSuc = 'Central';
+
+-- Vincular las cuentas creadas con los empleados
+INSERT INTO CtaCli (dniCli, numeroCta)
+SELECT
+    dniEmp,
+    dniEmp + 100  -- Usar el mismo número de cuenta creado
+FROM Empleados
+WHERE nombreSuc = 'Central';</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_actualización_de_datos_update">3.2. Actualización de Datos (UPDATE)</h3>
+<div class="sect3">
+<h4 id="_actualización_simple">3.2.1. Actualización Simple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Incrementar el saldo de todas las cuentas de la sucursal Central en un 10%
+UPDATE Cuentas
+SET saldo = saldo * 1.10
+WHERE nombreSuc = 'Central';
+
+-- Cambiar el domicilio de un cliente
+UPDATE Clientes
+SET domicilio = 'Nueva Calle 456'
+WHERE dniCli = 10;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_actualización_con_subconsultas">3.2.2. Actualización con Subconsultas</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Aumentar el saldo de las cuentas de los clientes que tienen un saldo mayor a 1000
+UPDATE Cuentas
+SET saldo = saldo * 1.05
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM CtaCli
+    WHERE dniCli IN (
+        SELECT dniCli
+        FROM Clientes
+        WHERE saldo &gt; 1000
+    )
+);
+-- Actualizar el activo de las sucursales según el saldo total de sus cuentas
+UPDATE Sucursales
+SET activo = (
+    SELECT COALESCE(SUM(saldo), 0)
+    FROM Cuentas
+    WHERE Cuentas.nombreSuc = Sucursales.nombreSuc
+);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_eliminación_de_datos_delete">3.3. Eliminación de Datos (DELETE)</h3>
+<div class="sect3">
+<h4 id="_eliminación_simple">3.3.1. Eliminación Simple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Eliminar un cliente específico
+DELETE FROM Clientes
+WHERE dniCli = 10;
+
+-- Eliminar todas las cuentas con saldo cero
+DELETE FROM Cuentas
+WHERE saldo = 0;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_eliminación_con_subconsultas">3.3.2. Eliminación con Subconsultas</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Eliminar las cuentas de los clientes que no han realizado movimientos en el último año
+DELETE FROM Cuentas
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM CtaCli
+    WHERE dniCli IN (
+        SELECT dniCli
+        FROM Clientes
+        WHERE ultimoMovimiento &lt; date('now', '-1 year')
+    )
+);
+
+-- Eliminar las relaciones cliente-cuenta para cuentas cerradas
+DELETE FROM CtaCli
+WHERE numeroCta IN (
+    SELECT numeroCta
+    FROM Cuentas
+    WHERE estado = 'CERRADA'
+);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_eliminación_con_join">3.3.3. Eliminación con JOIN</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Eliminar todas las cuentas de una sucursal que va a cerrar
+DELETE FROM Cuentas
+WHERE nombreSuc IN (
+    SELECT nombreSuc
+    FROM Sucursales
+    WHERE estado = 'PENDIENTE_CIERRE'
+);</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Antes de ejecutar operaciones de actualización o eliminación masiva:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Realizar una copia de seguridad de los datos</p>
+</li>
+<li>
+<p>Probar primero la consulta con SELECT para verificar qué registros se verán afectados</p>
+</li>
+<li>
+<p>Usar transacciones para poder revertir los cambios si algo sale mal</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Para operaciones que afecten a múltiples tablas relacionadas, considerar:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>El orden correcto de las operaciones para mantener la integridad referencial</p>
+</li>
+<li>
+<p>El uso de restricciones ON DELETE CASCADE cuando sea apropiado</p>
+</li>
+<li>
+<p>La posibilidad de usar transacciones para mantener la consistencia</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_procedimientos_almacenados">4. Procedimientos almacenados</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Los procedimientos almacenados son bloques de código SQL que se almacenan en el servidor de la base de datos. Estos procedimientos pueden ser invocados posteriormente por aplicaciones, otros procedimientos almacenados o triggers, permitiendo encapsular lógica compleja y reutilizable.</p>
+</div>
+<div class="sect2">
+<h3 id="_ventajas_de_los_procedimientos_almacenados">4.1. Ventajas de los procedimientos almacenados</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Rendimiento mejorado</strong>: Al estar precompilados y almacenados en el servidor, se ejecutan más rápidamente que consultas SQL enviadas individualmente.</p>
+</li>
+<li>
+<p><strong>Seguridad</strong>: Permiten controlar el acceso a los datos mediante permisos a nivel de procedimiento en lugar de a nivel de tabla.</p>
+</li>
+<li>
+<p><strong>Reutilización</strong>: El código se escribe una vez y puede ser utilizado por múltiples aplicaciones.</p>
+</li>
+<li>
+<p><strong>Mantenibilidad</strong>: Las modificaciones se realizan en un solo lugar, afectando a todas las aplicaciones que lo utilizan.</p>
+</li>
+<li>
+<p><strong>Reducción del tráfico de red</strong>: Al enviar una única llamada al procedimiento en lugar de múltiples consultas.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_estructura_básica">4.2. Estructura básica</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">CREATE PROCEDURE nombre_procedimiento
+    [parámetros]
+AS
+BEGIN
+    -- Lógica del procedimiento
+END;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parámetros">4.3. Parámetros</h3>
+<div class="paragraph">
+<p>Los procedimientos pueden aceptar parámetros de entrada y salida. Los parámetros de entrada permiten pasar valores al procedimiento, mientras que los parámetros de salida permiten devolver valores al llamador.
+Los parámetros pueden ser de tipo <code>IN</code>, <code>OUT</code> o <code>INOUT</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>IN</code>: Parámetro de entrada. Se utiliza para pasar valores al procedimiento.</p>
+</li>
+<li>
+<p><code>OUT</code>: Parámetro de salida. Se utiliza para devolver valores al llamador.</p>
+</li>
+<li>
+<p><code>INOUT</code>: Parámetro de entrada y salida. Se utiliza para pasar un valor al procedimiento y devolver un valor modificado.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Además, los parámetros pueden tener un valor predeterminado, lo que permite llamar al procedimiento sin especificar todos los parámetros.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaración_de_variables">4.4. Declaración de variables</h3>
+<div class="paragraph">
+<p>Las variables dentro de un procedimiento se declaran utilizando la palabra clave <code>DECLARE</code>. Estas variables pueden ser utilizadas para almacenar resultados intermedios, contadores, etc. Las variables pueden ser de diferentes tipos, como <code>INT</code>, <code>VARCHAR</code>, <code>FLOAT</code>, etc. Las variables deben ser declaradas al inicio del bloque del procedimiento, antes de cualquier otra instrucción. Las variables pueden ser inicializadas al momento de su declaración o posteriormente en el bloque del procedimiento.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_control_de_flujo">4.5. Control de flujo</h3>
+<div class="paragraph">
+<p>Los procedimientos almacenados pueden incluir estructuras de control de flujo, como <code>IF</code>, <code>CASE</code>, <code>WHILE</code>, <code>LOOP</code>, etc. Estas estructuras permiten ejecutar diferentes bloques de código según ciertas condiciones.
+Por ejemplo, se puede utilizar una estructura <code>IF</code> para verificar si un saldo es suficiente antes de realizar una transferencia. También se pueden utilizar bucles para iterar sobre conjuntos de resultados o realizar operaciones repetitivas.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_delimiter">4.6. <code>DELIMITER</code></h3>
+<div class="paragraph">
+<p>El delimitador es un carácter o secuencia de caracteres que indica el final de una instrucción SQL. En MySQL, el delimitador predeterminado es <code>;</code>. Sin embargo, al crear procedimientos almacenados, es necesario cambiar temporalmente el delimitador para evitar que el servidor interprete el <code>;</code> dentro del procedimiento como el final de la instrucción.
+Por lo tanto, se utiliza la instrucción <code>DELIMITER</code> para cambiar el delimitador a otro carácter o secuencia de caracteres (por ejemplo, <code>//</code>) antes de crear el procedimiento y luego se restablece al delimitador original.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_manejo_de_errores">4.7. Manejo de errores</h3>
+<div class="paragraph">
+<p>Los procedimientos almacenados pueden incluir manejo de errores para tratar situaciones excepcionales. Las principales instrucciones para el manejo de errores son:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SIGNAL</code>: Permite lanzar errores personalizados con códigos <code>SQLSTATE</code> y mensajes específicos.</p>
+</li>
+<li>
+<p><code>DECLARE HANDLER</code>: Define manejadores para capturar y procesar errores específicos.</p>
+</li>
+<li>
+<p><code>GET DIAGNOSTICS</code>: Obtiene información detallada sobre el último error ocurrido.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Los tipos de handlers más comunes son:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>CONTINUE</code>: Ejecuta el manejador y continúa con la siguiente instrucción.</p>
+</li>
+<li>
+<p><code>EXIT</code>: Ejecuta el manejador y sale del bloque actual.</p>
+</li>
+<li>
+<p><code>UNDO</code>: Similar a EXIT pero revierte la transacción actual.</p>
+</li>
+<li>
+<p><code>SQLEXCEPTION</code>: Captura excepciones SQL.</p>
+</li>
+<li>
+<p><code>SQLWARNING</code>: Captura advertencias SQL.</p>
+</li>
+<li>
+<p><code>NOT FOUND</code>: Captura el caso en que no se encuentra un registro.</p>
+</li>
+<li>
+<p><code>SQLSTATE</code>: Captura el estado SQL.</p>
+</li>
+<li>
+<p><code>SQLCODE</code>: Captura el código de error SQL.</p>
+</li>
+<li>
+<p>&#8230;&#8203;</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A continuación se muestra un ejemplo de cómo manejar errores en un procedimiento almacenado:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+BEGIN
+    -- Código para manejar el error
+    GET DIAGNOSTICS CONDITION 1
+    @sqlstate = RETURNED_SQLSTATE,
+    @errno = MYSQL_ERRNO,
+    @text = MESSAGE_TEXT;
+END;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_llamadas_a_procedimientos_almacenados">4.7.1. Llamadas a procedimientos almacenados</h4>
+<div class="paragraph">
+<p>Para invocar un procedimiento almacenado, se utiliza la instrucción <code>CALL</code> seguida del nombre del procedimiento y los parámetros necesarios. La sintaxis básica es:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">CALL nombre_procedimiento(parametro1, parametro2, ...);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Los parámetros pueden ser valores literales, variables o expresiones. Si el procedimiento tiene parámetros de salida, se deben declarar variables para recibir los valores devueltos. Las variables de salida deben ser precedidas por el símbolo <code>@</code> al momento de la llamada.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ejemplo_de_llamada_a_un_procedimiento">4.8. Ejemplo de llamada a un procedimiento</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">CALL ObtenerSaldo('12345', @saldo);
+SELECT @saldo;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_la_importancia_del_select_into">4.9. La importancia del <code>SELECT INTO</code></h3>
+<div class="paragraph">
+<p>El <code>SELECT INTO</code> es una instrucción SQL que permite seleccionar datos de una tabla y almacenarlos en variables. Es especialmente útil en procedimientos almacenados para asignar valores a variables locales. La sintaxis básica es:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">SELECT columna1, columna2, ...
+INTO variable1, variable2, ...
+FROM tabla
+WHERE condición;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>El <code>SELECT INTO</code> puede devolver múltiples filas, pero solo se puede asignar a una variable si se utiliza en un contexto donde se espera una sola fila. Si se espera que la consulta devuelva más de una fila, se debe utilizar un <em>cursor</em> o una estructura de control de flujo para manejar los resultados.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ejemplos_de_procedimientos_almacenados">4.10. Ejemplos de procedimientos almacenados</h3>
+<div class="paragraph">
+<p>A continuación se presentan algunos ejemplos de procedimientos almacenados que ilustran su uso en una base de datos bancaria.</p>
+</div>
+<div class="sect3">
+<h4 id="_ejemplo_de_procedimiento_simple">4.10.1. Ejemplo de procedimiento simple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Procedimiento para obtener el saldo de una cuenta
+-- Parámetros de entrada: número de cuenta
+-- Parámetros de salida: saldo
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS ObtenerSaldo //
+CREATE PROCEDURE ObtenerSaldo(
+    IN p_NumeroCta VARCHAR(5),
+    OUT p_Saldo FLOAT
+)
+BEGIN
+    SELECT saldo INTO p_Saldo
+    FROM Cuentas
+    WHERE numeroCta = p_NumeroCta;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Por ejemplo, para obtener el saldo de una cuenta, se puede llamar al procedimiento <code>ObtenerSaldo</code> de la siguiente manera:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para obtener el saldo de la cuenta '1'
+CALL ObtenerSaldo('1', @saldo);
+SELECT @saldo;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_crear_nueva_cuenta_bancaria">4.10.2. Crear nueva cuenta bancaria</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Procedimiento para crear una nueva cuenta bancaria
+-- Parámetros de entrada: número de cuenta, saldo inicial, nombre de la sucursal
+-- Parámetros de salida: ninguno
+-- Verifica si la sucursal existe antes de crear la cuenta
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS CrearCuenta //
+CREATE PROCEDURE CrearCuenta(
+    IN p_NumeroCta VARCHAR(5),
+    IN p_Saldo FLOAT,
+    IN p_NombreSuc VARCHAR(50)
+)
+BEGIN
+    DECLARE sucursal_existe INT;
+    SELECT COUNT(*) INTO sucursal_existe FROM Sucursales WHERE nombreSuc = p_NombreSuc;
+
+    IF sucursal_existe &gt; 0 THEN
+        INSERT INTO Cuentas (numeroCta, saldo, nombreSuc)
+        VALUES (p_NumeroCta, p_Saldo, p_NombreSuc);
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La sucursal especificada no existe';
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para crear una nueva cuenta bancaria, se puede llamar al procedimiento <code>CrearCuenta</code> de la siguiente manera:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para crear una nueva cuenta
+CALL CrearCuenta(100, 1000, 'Central');
+SELECT * FROM Cuentas WHERE numeroCta = 100;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ejemplo_con_control_de_flujo">4.10.3. Ejemplo con control de flujo</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Procedimiento para actualizar el saldo de una cuenta
+-- Parámetros de entrada: número de cuenta, importe a agregar o restar
+-- Parámetros de salida: ninguno
+-- Verifica si el saldo es suficiente antes de realizar la actualización
+-- Si el saldo es insuficiente, lanza un error
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS ActualizarSaldo //
+CREATE PROCEDURE ActualizarSaldo(
+    IN p_NumeroCta VARCHAR(5),
+    IN p_Importe FLOAT
+)
+BEGIN
+    DECLARE saldo_actual FLOAT;
+
+    -- Obtener el saldo actual
+    SELECT saldo INTO saldo_actual
+    FROM Cuentas
+    WHERE numeroCta = p_NumeroCta;
+
+    -- Verificar si el saldo es suficiente
+    IF saldo_actual + p_Importe &lt; 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Saldo insuficiente';
+    ELSE
+        -- Actualizar el saldo
+        UPDATE Cuentas
+        SET saldo = saldo + p_Importe
+        WHERE numeroCta = p_NumeroCta;
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para actualizar el saldo de una cuenta, se puede llamar al procedimiento <code>ActualizarSaldo</code> de la siguiente manera:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para actualizar el saldo de la cuenta '100'
+CALL ActualizarSaldo(100, -200);
+SELECT * FROM Cuentas WHERE numeroCta = 100;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ahora probar con un saldo insuficiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para actualizar el saldo de la cuenta '100' con un importe negativo
+-- que excede el saldo actual
+CALL ActualizarSaldo(100, -2000);
+SELECT * FROM Cuentas WHERE numeroCta = 100;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ejemplo_con_manejo_de_errores">4.10.4. Ejemplo con manejo de errores</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Procedimiento para realizar una transferencia entre cuentas
+-- Parámetros de entrada: cuenta de origen, cuenta de destino, importe a transferir
+-- Parámetros de salida: ninguno
+-- Verifica si el saldo es suficiente antes de realizar la transferencia
+-- Si el saldo es insuficiente en la cuenta origen, lanza un error
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS RealizarTransferencia //
+CREATE PROCEDURE RealizarTransferencia(
+    IN p_CuentaOrigen VARCHAR(5),
+    IN p_CuentaDestino VARCHAR(5),
+    IN p_Importe FLOAT
+)
+BEGIN
+    DECLARE saldo_origen FLOAT;
+    DECLARE saldo_destino FLOAT;
+
+    -- Obtener los saldos de ambas cuentas
+    SELECT saldo INTO saldo_origen
+    FROM Cuentas
+    WHERE numeroCta = p_CuentaOrigen;
+
+    SELECT saldo INTO saldo_destino
+    FROM Cuentas
+    WHERE numeroCta = p_CuentaDestino;
+
+    -- Verificar si el saldo es suficiente
+    IF saldo_origen &lt; p_Importe THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Saldo insuficiente en la cuenta de origen';
+    ELSE
+        -- Realizar la transferencia
+        UPDATE Cuentas
+        SET saldo = saldo - p_Importe
+        WHERE numeroCta = p_CuentaOrigen;
+
+        UPDATE Cuentas
+        SET saldo = saldo + p_Importe
+        WHERE numeroCta = p_CuentaDestino;
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Antes de hacer un ejemplo de transferencia entre las cuentas <code>100</code> y <code>116</code>, vamos a ver el saldo de ambas cuentas para poder comprobar que la transferencia se realiza correctamente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Ver saldo de las cuentas antes de la transferencia
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para realizar una transferencia entre cuentas, se puede llamar al procedimiento <code>RealizarTransferencia</code> de la siguiente manera:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para realizar una transferencia de la cuenta '100' a la cuenta '116'
+-- con un importe de 200
+CALL RealizarTransferencia(100, 116, 200);
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Luego probar con un saldo insuficiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Llamada al procedimiento para realizar una transferencia de la cuenta '100' a la cuenta '116'
+-- con un importe que excede el saldo actual
+-- Esto debería lanzar un error de saldo insuficiente
+CALL RealizarTransferencia(100, 116, 2000);
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_triggers">5. Triggers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Los triggers (o disparadores) son objetos de base de datos que se ejecutan automáticamente en respuesta a ciertos eventos sobre una tabla, como inserción (INSERT), actualización (UPDATE) o borrado (DELETE) de registros.</p>
+</div>
+<div class="paragraph">
+<p>Los triggers permiten implementar lógica de negocio compleja y mantener la integridad de los datos sin necesidad de modificar el código de la aplicación.
+Los triggers se definen en la base de datos y se asocian a una tabla específica. Se pueden utilizar para realizar acciones como:
+* Validar datos antes de insertarlos o actualizarlos
+* Mantener registros de auditoría
+* Actualizar automáticamente otros registros o tablas
+* Enviar notificaciones o alertas
+* Implementar reglas de negocio complejas
+* Realizar cálculos automáticos
+* Sincronizar datos entre tablas
+* Aplicar restricciones adicionales a los datos
+* Realizar acciones en cascada (por ejemplo, eliminar registros relacionados)</p>
+</div>
+<div class="paragraph">
+<p>Su sintaxis básica es la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">CREATE TRIGGER nombre_trigger
+{BEFORE|AFTER} {INSERT|UPDATE|DELETE}
+ON nombre_tabla
+FOR EACH ROW
+BEGIN
+    -- Lógica del trigger
+END;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_descripción_de_la_sintaxis">5.1. Descripción de la sintaxis</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>BEFORE</code>: El trigger se ejecuta antes de que la operación (<code>INSERT/UPDATE/DELETE</code>) se realice en la tabla. Es útil para:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Validar o modificar los datos antes de que se guarden</p>
+</li>
+<li>
+<p>Realizar comprobaciones de reglas de negocio</p>
+</li>
+<li>
+<p>Asignar valores por defecto</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>AFTER</code>: El trigger se ejecuta después de que la operación se haya completado. Se usa para:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Registrar auditorías</p>
+</li>
+<li>
+<p>Actualizar tablas relacionadas</p>
+</li>
+<li>
+<p>Enviar notificaciones</p>
+</li>
+<li>
+<p>Mantener datos agregados</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>INSTEAD OF</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Este es un tipo especial de trigger disponible principalmente en SQL Server (no en MySQL). Como su nombre indica, se ejecuta en lugar de la operación original.</p>
+</div>
+<div class="paragraph">
+<p>Como características principales destacan:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Se utiliza principalmente en vistas</p>
+</li>
+<li>
+<p>Permite realizar operaciones complejas en lugar de la operación original</p>
+</li>
+<li>
+<p>Permite realizar operaciones en múltiples tablas</p>
+</li>
+<li>
+<p>Permite realizar operaciones que normalmente no se pueden hacer directamente en la vista</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>En definitiva, da control total sobre cómo se procesan las operaciones</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>FOR EACH ROW</code>: Indica que el trigger se ejecutará para cada fila afectada por la operación. Esto significa que si una operación afecta a múltiples filas, el trigger se ejecutará una vez por cada fila.</p>
+</li>
+<li>
+<p><code>FOR EACH STATEMENT</code>: Indica que el trigger se ejecutará una sola vez para toda la declaración, independientemente de cuántas filas se vean afectadas. Este tipo de trigger es menos común y no está disponible en todos los sistemas de gestión de bases de datos.</p>
+</li>
+<li>
+<p><code>NEW</code> y <code>OLD</code>: Son palabras clave que se utilizan para referirse a los valores de las filas afectadas por la operación. <code>NEW</code> se refiere a los nuevos valores que se están insertando o actualizando, mientras que <code>OLD</code> se refiere a los valores anteriores antes de la operación.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ejemplos_prácticos">5.2. Ejemplos Prácticos</h3>
+<div class="sect3">
+<h4 id="_ejemplo_de_actualización_de_saldo">5.2.1. Ejemplo de actualización de saldo</h4>
+<div class="paragraph">
+<p>Con este trigger, cada vez que se inserte un nuevo movimiento en la tabla <code>Movimientos</code>, se actualizará automáticamente el saldo de la cuenta correspondiente.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Trigger para actualizar el saldo de la cuenta después de insertar un movimiento
+DELIMITER //
+
+DROP TRIGGER IF EXISTS ActualizarSaldo //
+CREATE TRIGGER ActualizarSaldo
+AFTER INSERT
+ON Transacciones
+FOR EACH ROW
+BEGIN
+    UPDATE Cuentas
+    SET saldo = saldo + NEW.importe
+    WHERE numeroCta = NEW.numeroCta;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este trigger se ejecuta después de que se inserte un nuevo movimiento en la tabla <code>Transacciones</code>. Actualiza el saldo de la cuenta correspondiente sumando el importe del movimiento.
+* <code>AFTER INSERT</code>: Indica que el trigger se ejecutará después de que se inserte un nuevo movimiento.
+* El uso de <code>NEW.importe</code> permite acceder al valor del importe del nuevo movimiento que se está insertando.</p>
+</div>
+<div class="paragraph">
+<p>Para probarlo, consultar el saldo de la cuenta <code>100</code>, insertar un nuevo movimiento y volver a consultar el saldo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Consultar el saldo de la cuenta antes de insertar un movimiento
+SELECT saldo
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 1, NOW(), 100.00);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debería haber aumentado en 100.00
+SELECT saldo
+FROM Cuentas
+WHERE numeroCta = 100;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ejemplo_de_gestión_de_descubiertos">5.2.2. Ejemplo de gestión de descubiertos</h4>
+<div class="paragraph">
+<p>Para la gestión de descubiertos, se van a crear dos tablas: una de <code>Descubiertos</code> que almacenará los descubiertos de las cuentas, y otra de <code>Notificaciones</code> que almacenará las notificaciones enviadas a los clientes.</p>
+</div>
+<div class="paragraph">
+<p>La tabla <code>Descubiertos</code> tendrá las siguientes columnas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>numeroCta</code>: Número de cuenta en descubierto</p>
+</li>
+<li>
+<p><code>fecha</code>: Fecha en la que se detectó el descubierto</p>
+</li>
+<li>
+<p><code>importe</code>: Importe del descubierto</p>
+</li>
+<li>
+<p><code>estado</code>: Estado del descubierto (pendiente, resuelto, etc.)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>La tabla <code>Notificaciones</code> tendrá las siguientes columnas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>numeroCta</code>: Número de cuenta notificada</p>
+</li>
+<li>
+<p><code>fecha</code>: Fecha de la notificación</p>
+</li>
+<li>
+<p><code>mensaje</code>: Mensaje de la notificación</p>
+</li>
+<li>
+<p><code>estado</code>: Estado de la notificación (enviada, no enviada, etc.)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para gestionar los descubiertos, se va a crear un trigger que se activará después de cada actualización en la tabla <code>Cuentas</code>. Este trigger verificará si el saldo de la cuenta ha caído por debajo de cero y, en caso afirmativo, insertará un registro en la tabla <code>Descubiertos</code> y un registro en la tabla <code>Notificaciones</code>.</p>
+</div>
+<div class="paragraph">
+<p>Comencemos creando las tablas:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Crear las tablas Descubiertos y Notificaciones
+DROP TABLE IF EXISTS Descubiertos;
+DROP TABLE IF EXISTS Notificaciones;
+
+CREATE TABLE Descubiertos (
+    numeroCta VARCHAR(20),
+    fecha DATE,
+    importe DECIMAL(10, 2),
+    estado ENUM('PENDIENTE', 'RESUELTO')
+);
+CREATE TABLE Notificaciones (
+    numeroCta tinyint(4),
+    fecha DATE,
+    mensaje VARCHAR(255),
+    estado ENUM('ENVIADA', 'NO_ENVIADA')
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A continuación, creamos el trigger:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Trigger para gestionar los descubiertos de las cuentas
+-- y enviar notificaciones a los clientes
+-- cuando el saldo de la cuenta es negativo
+DELIMITER //
+
+CREATE TRIGGER GestionarDescubiertos
+AFTER UPDATE
+ON Cuentas
+FOR EACH ROW
+BEGIN
+    IF NEW.saldo &lt; 0 THEN
+        INSERT INTO Descubiertos (numeroCta, fecha, importe, estado)
+        VALUES (NEW.numeroCta, NOW(), -NEW.saldo, 'PENDIENTE');
+
+        INSERT INTO Notificaciones (numeroCta, fecha, mensaje, estado)
+        VALUES (NEW.numeroCta, NOW(), 'Se ha detectado un descubierto en su cuenta de ' || -NEW.saldo, 'ENVIADA');
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este trigger se ejecuta después de cada actualización en la tabla <code>Cuentas</code>. Si el saldo de la cuenta cae por debajo de cero, se inserta un registro en la tabla <code>Descubiertos</code> y otro en la tabla <code>Notificaciones</code>, indicando que se ha detectado un descubierto y que se ha enviado una notificación al cliente.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>El uso de <code>NEW.saldo</code> permite acceder al nuevo saldo de la cuenta después de la actualización. La función <code>NOW()</code> se utiliza para obtener la fecha y hora actuales.</p>
+</li>
+<li>
+<p>El uso de <code>-NEW.saldo</code> permite calcular el importe del descubierto, que es el saldo negativo de la cuenta.</p>
+</li>
+<li>
+<p>El uso de <code>||</code> permite concatenar cadenas de texto en SQL. En este caso, se utiliza para crear el mensaje de la notificación.</p>
+</li>
+<li>
+<p>El uso de <code>IF</code> permite ejecutar una acción condicionalmente, en este caso, solo si el saldo es negativo.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_revisión_del_trigger_de_actualización_de_saldo">5.2.3. Revisión del trigger de actualización de saldo</h4>
+<div class="paragraph">
+<p>Anteriormente, se ha creado un trigger que actualiza el saldo de la cuenta después de cada inserción en la tabla <code>Transacciones</code>. Por otro lado, se ha creado otro trigger que gestiona los descubiertos de las cuentas después de cada actualización en la tabla <code>Cuentas</code> y anota los descubiertos en la tabla <code>Descubiertos</code> y las notificaciones en la tabla <code>Notificaciones</code>. En cuanto una cuenta en descubierto vuelve a estar en positivo, se debe actualizar el estado del descubierto a "RESUELTO". A continuación se muestra el código modificado para el trigger de actualización de saldo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Trigger para actualizar el saldo de la cuenta después de insertar un movimiento
+-- y gestionar los descubiertos
+-- y enviar notificaciones a los clientes
+-- cuando el saldo de la cuenta es negativo
+-- y actualizar el estado del descubierto a "RESUELTO" cuando el saldo es positivo
+-- y el saldo anterior era negativo
+
+DELIMITER //
+
+DROP TRIGGER IF EXISTS ActualizarSaldo //
+CREATE TRIGGER ActualizarSaldo
+AFTER INSERT
+ON Transacciones
+FOR EACH ROW
+BEGIN
+    DECLARE saldo_anterior DECIMAL(10, 2);
+    DECLARE nuevo_saldo DECIMAL(10, 2);
+
+    -- Obtener el saldo anterior de la cuenta
+    SELECT saldo INTO saldo_anterior
+    FROM Cuentas
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Actualizar el saldo de la cuenta
+    UPDATE Cuentas
+    SET saldo = saldo + NEW.importe
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Obtener el nuevo saldo de la cuenta
+    SELECT saldo INTO nuevo_saldo
+    FROM Cuentas
+    WHERE numeroCta = NEW.numeroCta;
+
+    -- Verificar si el saldo anterior era negativo y el nuevo saldo es positivo
+    IF saldo_anterior &lt; 0 AND nuevo_saldo &gt;= 0 THEN
+        -- Actualizar el estado del descubierto a "RESUELTO"
+        UPDATE Descubiertos
+        SET estado = 'RESUELTO'
+        WHERE numeroCta = NEW.numeroCta
+        AND estado = 'PENDIENTE';
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este trigger se ejecuta después de cada inserción en la tabla <code>Transacciones</code>. Primero, obtiene el saldo anterior de la cuenta antes de actualizarlo. Luego, actualiza el saldo de la cuenta y verifica si el saldo anterior era negativo y el nuevo saldo es positivo. Si es así, actualiza el estado del descubierto a "RESUELTO" en la tabla <code>Descubiertos</code>.</p>
+</div>
+<div class="paragraph">
+<p>El uso de <code>saldo_anterior</code> permite almacenar el saldo antes de la actualización y utilizarlo para verificar si el saldo ha cambiado de negativo a positivo. Esto asegura que solo se actualice el estado del descubierto si la cuenta ha pasado de estar en descubierto a estar en positivo.</p>
+</div>
+<div class="paragraph">
+<p>Para probarlo, se puede insertar un nuevo movimiento en la tabla <code>Transacciones</code> y verificar el estado del descubierto en la tabla <code>Descubiertos</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- Consultar el saldo de la cuenta antes de insertar un movimiento
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+-- que reduce el saldo de la cuenta a negativo
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 2, NOW(), -800);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debe ser negativo
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Consultar el estado del descubierto después de insertar el movimiento
+-- Debe haber un nuevo registro en la tabla Descubiertos
+-- y el estado debe ser "PENDIENTE"
+SELECT *
+FROM Descubiertos
+WHERE numeroCta = 100;
+
+-- Consultar el estado de las notificaciones
+-- Debe haber un nuevo registro en la tabla Notificaciones
+-- y el estado debe ser "ENVIADA"
+SELECT *
+FROM Notificaciones
+WHERE numeroCta = 100;
+
+-- Insertar un nuevo movimiento en la tabla Transacciones
+-- que convierte el saldo de la cuenta a positivo
+-- y actualiza el estado del descubierto a "RESUELTO"
+INSERT INTO Transacciones (numeroCta, numeroTrans, fecha, importe)
+VALUES (100, 3, NOW(), 500);
+
+-- Consultar el saldo de la cuenta después de insertar el movimiento
+-- El saldo debe ser positivo
+SELECT *
+FROM Cuentas
+WHERE numeroCta = 100;
+
+-- Consultar el estado del descubierto después de insertar el movimiento
+-- El estado debe ser "RESUELTO"
+SELECT *
+FROM Descubiertos
+WHERE numeroCta = 100;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este conjunto de consultas permite verificar el estado del descubierto antes y después de insertar un nuevo movimiento en la tabla <code>Transacciones</code>. Se puede observar cómo el estado del descubierto cambia de "PENDIENTE" a "RESUELTO" cuando el saldo de la cuenta pasa de negativo a positivo.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_licencia">Licencia</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Licencia CC BY-NC-ND 4.0</p>
+</div>
+<div class="paragraph">
+<p>Copyright (c) 2025 [Manuel Torres - Departamento de Informática - Universidad de Almería]</p>
+</div>
+<div class="paragraph">
+<p>Este proyecto está licenciado bajo la Licencia CC BY-NC-ND 4.0. Esto significa que puedes compartir el proyecto siempre que cites al autor, no lo uses para fines comerciales y no realices obras derivadas.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-01 20:32:57 +0200
+Last updated 2025-04-03 18:21:43 +0200
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

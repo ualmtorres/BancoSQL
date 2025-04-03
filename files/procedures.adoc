@@ -1,0 +1,330 @@
+== Procedimientos almacenados
+
+Los procedimientos almacenados son bloques de código SQL que se almacenan en el servidor de la base de datos. Estos procedimientos pueden ser invocados posteriormente por aplicaciones, otros procedimientos almacenados o triggers, permitiendo encapsular lógica compleja y reutilizable.
+
+=== Ventajas de los procedimientos almacenados
+
+* *Rendimiento mejorado*: Al estar precompilados y almacenados en el servidor, se ejecutan más rápidamente que consultas SQL enviadas individualmente.
+* *Seguridad*: Permiten controlar el acceso a los datos mediante permisos a nivel de procedimiento en lugar de a nivel de tabla.
+* *Reutilización*: El código se escribe una vez y puede ser utilizado por múltiples aplicaciones.
+* *Mantenibilidad*: Las modificaciones se realizan en un solo lugar, afectando a todas las aplicaciones que lo utilizan.
+* *Reducción del tráfico de red*: Al enviar una única llamada al procedimiento en lugar de múltiples consultas.
+
+=== Estructura básica
+
+[source,sql]
+----
+CREATE PROCEDURE nombre_procedimiento
+    [parámetros]
+AS
+BEGIN
+    -- Lógica del procedimiento
+END;
+----
+
+=== Parámetros
+
+Los procedimientos pueden aceptar parámetros de entrada y salida. Los parámetros de entrada permiten pasar valores al procedimiento, mientras que los parámetros de salida permiten devolver valores al llamador.
+Los parámetros pueden ser de tipo `IN`, `OUT` o `INOUT`:
+
+* `IN`: Parámetro de entrada. Se utiliza para pasar valores al procedimiento.
+* `OUT`: Parámetro de salida. Se utiliza para devolver valores al llamador.
+* `INOUT`: Parámetro de entrada y salida. Se utiliza para pasar un valor al procedimiento y devolver un valor modificado.
+
+Además, los parámetros pueden tener un valor predeterminado, lo que permite llamar al procedimiento sin especificar todos los parámetros.
+
+=== Declaración de variables
+
+Las variables dentro de un procedimiento se declaran utilizando la palabra clave `DECLARE`. Estas variables pueden ser utilizadas para almacenar resultados intermedios, contadores, etc. Las variables pueden ser de diferentes tipos, como `INT`, `VARCHAR`, `FLOAT`, etc. Las variables deben ser declaradas al inicio del bloque del procedimiento, antes de cualquier otra instrucción. Las variables pueden ser inicializadas al momento de su declaración o posteriormente en el bloque del procedimiento.
+
+=== Control de flujo
+Los procedimientos almacenados pueden incluir estructuras de control de flujo, como `IF`, `CASE`, `WHILE`, `LOOP`, etc. Estas estructuras permiten ejecutar diferentes bloques de código según ciertas condiciones.
+Por ejemplo, se puede utilizar una estructura `IF` para verificar si un saldo es suficiente antes de realizar una transferencia. También se pueden utilizar bucles para iterar sobre conjuntos de resultados o realizar operaciones repetitivas.
+
+=== `DELIMITER`
+
+El delimitador es un carácter o secuencia de caracteres que indica el final de una instrucción SQL. En MySQL, el delimitador predeterminado es `;`. Sin embargo, al crear procedimientos almacenados, es necesario cambiar temporalmente el delimitador para evitar que el servidor interprete el `;` dentro del procedimiento como el final de la instrucción.
+Por lo tanto, se utiliza la instrucción `DELIMITER` para cambiar el delimitador a otro carácter o secuencia de caracteres (por ejemplo, `//`) antes de crear el procedimiento y luego se restablece al delimitador original.
+
+
+=== Manejo de errores
+
+Los procedimientos almacenados pueden incluir manejo de errores para tratar situaciones excepcionales. Las principales instrucciones para el manejo de errores son:
+
+* `SIGNAL`: Permite lanzar errores personalizados con códigos `SQLSTATE` y mensajes específicos.
+* `DECLARE HANDLER`: Define manejadores para capturar y procesar errores específicos.
+* `GET DIAGNOSTICS`: Obtiene información detallada sobre el último error ocurrido.
+
+Los tipos de handlers más comunes son:
+
+* `CONTINUE`: Ejecuta el manejador y continúa con la siguiente instrucción.
+* `EXIT`: Ejecuta el manejador y sale del bloque actual.
+* `UNDO`: Similar a EXIT pero revierte la transacción actual.
+* `SQLEXCEPTION`: Captura excepciones SQL.
+* `SQLWARNING`: Captura advertencias SQL.
+* `NOT FOUND`: Captura el caso en que no se encuentra un registro.
+* `SQLSTATE`: Captura el estado SQL.
+* `SQLCODE`: Captura el código de error SQL.
+* ...
+
+A continuación se muestra un ejemplo de cómo manejar errores en un procedimiento almacenado:
+
+[source,sql]
+----
+DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+BEGIN
+    -- Código para manejar el error
+    GET DIAGNOSTICS CONDITION 1
+    @sqlstate = RETURNED_SQLSTATE,
+    @errno = MYSQL_ERRNO,
+    @text = MESSAGE_TEXT;
+END;
+----
+
+==== Llamadas a procedimientos almacenados
+
+Para invocar un procedimiento almacenado, se utiliza la instrucción `CALL` seguida del nombre del procedimiento y los parámetros necesarios. La sintaxis básica es:
+
+[source,sql]
+----
+CALL nombre_procedimiento(parametro1, parametro2, ...);
+----
+
+Los parámetros pueden ser valores literales, variables o expresiones. Si el procedimiento tiene parámetros de salida, se deben declarar variables para recibir los valores devueltos. Las variables de salida deben ser precedidas por el símbolo `@` al momento de la llamada.
+
+=== Ejemplo de llamada a un procedimiento
+[source,sql]
+----
+CALL ObtenerSaldo('12345', @saldo);
+SELECT @saldo;
+----
+
+=== La importancia del `SELECT INTO`
+
+El `SELECT INTO` es una instrucción SQL que permite seleccionar datos de una tabla y almacenarlos en variables. Es especialmente útil en procedimientos almacenados para asignar valores a variables locales. La sintaxis básica es:
+
+[source,sql]
+----
+SELECT columna1, columna2, ...
+INTO variable1, variable2, ...
+FROM tabla
+WHERE condición;
+----
+El `SELECT INTO` puede devolver múltiples filas, pero solo se puede asignar a una variable si se utiliza en un contexto donde se espera una sola fila. Si se espera que la consulta devuelva más de una fila, se debe utilizar un _cursor_ o una estructura de control de flujo para manejar los resultados.
+
+=== Ejemplos de procedimientos almacenados
+
+A continuación se presentan algunos ejemplos de procedimientos almacenados que ilustran su uso en una base de datos bancaria.
+
+==== Ejemplo de procedimiento simple
+
+[source,sql]
+----
+-- Procedimiento para obtener el saldo de una cuenta
+-- Parámetros de entrada: número de cuenta
+-- Parámetros de salida: saldo
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS ObtenerSaldo //
+CREATE PROCEDURE ObtenerSaldo(
+    IN p_NumeroCta VARCHAR(5),
+    OUT p_Saldo FLOAT
+)
+BEGIN
+    SELECT saldo INTO p_Saldo
+    FROM Cuentas
+    WHERE numeroCta = p_NumeroCta;
+END //
+
+DELIMITER ;
+----
+
+Por ejemplo, para obtener el saldo de una cuenta, se puede llamar al procedimiento `ObtenerSaldo` de la siguiente manera:
+
+[source,sql]
+----
+-- Llamada al procedimiento para obtener el saldo de la cuenta '1'
+CALL ObtenerSaldo('1', @saldo);
+SELECT @saldo;
+----
+
+==== Crear nueva cuenta bancaria
+
+[source,sql]
+----
+-- Procedimiento para crear una nueva cuenta bancaria
+-- Parámetros de entrada: número de cuenta, saldo inicial, nombre de la sucursal
+-- Parámetros de salida: ninguno
+-- Verifica si la sucursal existe antes de crear la cuenta
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS CrearCuenta //
+CREATE PROCEDURE CrearCuenta(
+    IN p_NumeroCta VARCHAR(5),
+    IN p_Saldo FLOAT,
+    IN p_NombreSuc VARCHAR(50)
+)
+BEGIN
+    DECLARE sucursal_existe INT;
+    SELECT COUNT(*) INTO sucursal_existe FROM Sucursales WHERE nombreSuc = p_NombreSuc;
+    
+    IF sucursal_existe > 0 THEN
+        INSERT INTO Cuentas (numeroCta, saldo, nombreSuc)
+        VALUES (p_NumeroCta, p_Saldo, p_NombreSuc);
+    ELSE
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'La sucursal especificada no existe';
+    END IF;
+END //
+
+DELIMITER ;
+----
+
+Para crear una nueva cuenta bancaria, se puede llamar al procedimiento `CrearCuenta` de la siguiente manera:
+
+[source,sql]
+----
+-- Llamada al procedimiento para crear una nueva cuenta
+CALL CrearCuenta(100, 1000, 'Central');
+SELECT * FROM Cuentas WHERE numeroCta = 100;
+----
+
+==== Ejemplo con control de flujo
+
+[source,sql]
+----
+-- Procedimiento para actualizar el saldo de una cuenta
+-- Parámetros de entrada: número de cuenta, importe a agregar o restar
+-- Parámetros de salida: ninguno
+-- Verifica si el saldo es suficiente antes de realizar la actualización
+-- Si el saldo es insuficiente, lanza un error
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS ActualizarSaldo //
+CREATE PROCEDURE ActualizarSaldo(
+    IN p_NumeroCta VARCHAR(5),
+    IN p_Importe FLOAT
+)
+BEGIN
+    DECLARE saldo_actual FLOAT;
+    
+    -- Obtener el saldo actual
+    SELECT saldo INTO saldo_actual
+    FROM Cuentas
+    WHERE numeroCta = p_NumeroCta;
+    
+    -- Verificar si el saldo es suficiente
+    IF saldo_actual + p_Importe < 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Saldo insuficiente';
+    ELSE
+        -- Actualizar el saldo
+        UPDATE Cuentas
+        SET saldo = saldo + p_Importe
+        WHERE numeroCta = p_NumeroCta;
+    END IF;
+END //
+
+DELIMITER ;
+----
+
+Para actualizar el saldo de una cuenta, se puede llamar al procedimiento `ActualizarSaldo` de la siguiente manera:
+
+[source,sql]
+----
+-- Llamada al procedimiento para actualizar el saldo de la cuenta '100'
+CALL ActualizarSaldo(100, -200);
+SELECT * FROM Cuentas WHERE numeroCta = 100;
+----
+
+Ahora probar con un saldo insuficiente:
+
+[source,sql]
+----
+-- Llamada al procedimiento para actualizar el saldo de la cuenta '100' con un importe negativo
+-- que excede el saldo actual
+CALL ActualizarSaldo(100, -2000);
+SELECT * FROM Cuentas WHERE numeroCta = 100;
+----
+
+==== Ejemplo con manejo de errores
+[source,sql]
+----
+-- Procedimiento para realizar una transferencia entre cuentas
+-- Parámetros de entrada: cuenta de origen, cuenta de destino, importe a transferir
+-- Parámetros de salida: ninguno
+-- Verifica si el saldo es suficiente antes de realizar la transferencia
+-- Si el saldo es insuficiente en la cuenta origen, lanza un error
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS RealizarTransferencia //
+CREATE PROCEDURE RealizarTransferencia(
+    IN p_CuentaOrigen VARCHAR(5),
+    IN p_CuentaDestino VARCHAR(5),
+    IN p_Importe FLOAT
+)
+BEGIN
+    DECLARE saldo_origen FLOAT;
+    DECLARE saldo_destino FLOAT;
+    
+    -- Obtener los saldos de ambas cuentas
+    SELECT saldo INTO saldo_origen
+    FROM Cuentas
+    WHERE numeroCta = p_CuentaOrigen;
+    
+    SELECT saldo INTO saldo_destino
+    FROM Cuentas
+    WHERE numeroCta = p_CuentaDestino;
+    
+    -- Verificar si el saldo es suficiente
+    IF saldo_origen < p_Importe THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Saldo insuficiente en la cuenta de origen';
+    ELSE
+        -- Realizar la transferencia
+        UPDATE Cuentas
+        SET saldo = saldo - p_Importe
+        WHERE numeroCta = p_CuentaOrigen;
+        
+        UPDATE Cuentas
+        SET saldo = saldo + p_Importe
+        WHERE numeroCta = p_CuentaDestino;
+    END IF;
+END //
+
+DELIMITER ;
+----
+
+Antes de hacer un ejemplo de transferencia entre las cuentas `100` y `116`, vamos a ver el saldo de ambas cuentas para poder comprobar que la transferencia se realiza correctamente:
+
+[source,sql]
+----
+-- Ver saldo de las cuentas antes de la transferencia
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');
+----
+
+
+Para realizar una transferencia entre cuentas, se puede llamar al procedimiento `RealizarTransferencia` de la siguiente manera:
+
+[source,sql]
+----
+-- Llamada al procedimiento para realizar una transferencia de la cuenta '100' a la cuenta '116'
+-- con un importe de 200
+CALL RealizarTransferencia(100, 116, 200);
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');
+----
+
+Luego probar con un saldo insuficiente:
+
+[source,sql]
+----
+-- Llamada al procedimiento para realizar una transferencia de la cuenta '100' a la cuenta '116'
+-- con un importe que excede el saldo actual
+-- Esto debería lanzar un error de saldo insuficiente
+CALL RealizarTransferencia(100, 116, 2000);
+SELECT * FROM Cuentas WHERE numeroCta IN ('100', '116');
+----
+
+
+
