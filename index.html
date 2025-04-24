@@ -1794,6 +1794,82 @@ WHERE	Aux.mejorCuenta = Cuentas.numeroCta;</code></pre>
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_common_table_expressions_cte">2.11.4. Common Table Expressions (CTE)</h4>
+<div class="paragraph">
+<p>Las CTE son una forma de definir subconsultas que pueden ser referenciadas múltiples veces dentro de una consulta. Se definen utilizando la cláusula <code>WITH</code> y son útiles para mejorar la legibilidad y organización de las consultas complejas. Podemos entender las CTE como una forma de crear tablas temporales que pueden ser referenciadas en la consulta principal. Esto es especialmente útil cuando se necesita realizar múltiples operaciones sobre el mismo conjunto de datos o cuando se desea dividir una consulta compleja en partes más manejables y definir una consulta por partes. La sintaxis básica de una CTE es la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">WITH nombre_cte AS (
+    SELECT columna1, columna2, ...
+    FROM tabla
+    WHERE condiciones
+)
+SELECT *
+FROM nombre_cte, otras_tablas
+WHERE condiciones_adicionales;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>En esta sintaxis:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>WITH nombre_cte AS (&#8230;&#8203;)</code>: Define la CTE con un nombre específico (<code>nombre_cte</code>) y la consulta que se utilizará para generar los datos de la CTE.</p>
+</li>
+<li>
+<p><code>SELECT columna1, columna2, &#8230;&#8203;</code>: Especifica las columnas que se desean seleccionar de la CTE.</p>
+</li>
+<li>
+<p><code>FROM nombre_cte, otras_tablas</code>: Indica que se utilizará la CTE como una tabla en la consulta principal, junto con otras tablas si es necesario.</p>
+</li>
+<li>
+<p><code>WHERE condiciones_adicionales</code>: Especifica condiciones adicionales para filtrar los resultados de la consulta principal.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>La consulta que se muestra a continuación ilustra el uso de CTE para obtener los empleados que trabajan en la misma sucursal que el empleado <code>Smith</code>, excluyendo a <code>Smith</code> de la lista de resultados. La consulta se divide en dos partes: la primera parte define la CTE y la segunda parte utiliza esa CTE para filtrar los resultados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">WITH SucursalDeSmith AS (
+    SELECT nombresuc
+    FROM Empleados
+    WHERE nombreemp = 'Smith'
+)
+SELECT nombreemp
+FROM Empleados
+WHERE nombresuc IN (SELECT nombresuc FROM SucursalDeSmith)
+      AND nombreemp &lt;&gt; 'Smith';</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Otro ejemplo útil puede ser cuando realizamos agrupaciones y queremos mostrar en el <code>SELECT</code> columnas que ni están en la cláusula <code>GROUP BY</code> ni se usan con una función de agregación. En este caso, podemos usar una CTE para realizar la agrupación y luego hacer un <code>JOIN</code> con la tabla original para obtener las columnas adicionales que necesitamos. La consulta sería la siguiente, que muestra el número de cuentas por sucursal y la ciudad de cada sucursal:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">WITH CuentasAgrupadas AS (
+    SELECT nombreSuc, COUNT(*) AS numCuentas
+    FROM Cuentas
+    GROUP BY nombreSuc
+)
+SELECT CuentasAgrupadas.nombreSuc, CuentasAgrupadas.numCuentas, Sucursales.ciudadsuc
+FROM CuentasAgrupadas
+JOIN Sucursales ON CuentasAgrupadas.nombreSuc = Sucursales.nombreSuc;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esta consulta SQL utiliza una CTE para contar el número de cuentas por sucursal y luego une esa información con la tabla <code>Sucursales</code> para obtener la ciudad de cada sucursal.</p>
+</div>
+<div class="paragraph">
+<p>La consulta se divide en dos partes:
+* La primera parte define la CTE <code>CuentasAgrupadas</code>, que cuenta el número de cuentas (<code>COUNT(*)</code>) por sucursal (<code>nombreSuc</code>) y agrupa los resultados por sucursal (<code>GROUP BY nombreSuc</code>).
+* La segunda parte selecciona el nombre de la sucursal (<code>CuentasAgrupadas.nombreSuc</code>), el número de cuentas (<code>CuentasAgrupadas.numCuentas</code>) y la ciudad de la sucursal (<code>Sucursales.ciudadsuc</code>) de la CTE <code>CuentasAgrupadas</code> y la tabla <code>Sucursales</code>. La unión se realiza utilizando el campo <code>nombreSuc</code> para relacionar ambas tablas.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_los_operadores_exists_all_y_any">2.12. Los operadores <code>EXISTS</code>, <code>ALL</code> y <code>ANY</code></h3>
@@ -3849,7 +3925,7 @@ WHERE numeroCta = 100;</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-03 18:21:43 +0200
+Last updated 2025-04-24 12:48:14 +0200
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

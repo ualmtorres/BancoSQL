@@ -247,6 +247,27 @@ FROM  (SELECT nombrecli, ( SELECT      Cu.numerocta
         Cuentas
 WHERE	Aux.mejorCuenta = Cuentas.numeroCta;
 
+-- Empleados que trabajan en la misma sucursal que Smith usando CTE
+WITH SucursalDeSmith AS (
+    SELECT nombresuc
+    FROM Empleados
+    WHERE nombreemp = 'Smith'
+)
+SELECT nombreemp
+FROM Empleados
+WHERE nombresuc IN (SELECT nombresuc FROM SucursalDeSmith)
+      AND nombreemp <> 'Smith';
+
+-- Número de cuentas por sucursal y la ciudad de cada sucursa usando CTE
+WITH CuentasAgrupadas AS (
+    SELECT nombreSuc, COUNT(*) AS numCuentas
+    FROM Cuentas
+    GROUP BY nombreSuc
+)
+SELECT CuentasAgrupadas.nombreSuc, CuentasAgrupadas.numCuentas, Sucursales.ciudadsuc
+FROM CuentasAgrupadas
+JOIN Sucursales ON CuentasAgrupadas.nombreSuc = Sucursales.nombreSuc;
+
 -- Nombres de sucursales que tienen empleados (con consultas correlacionadas)
 SELECT  nombresuc
 FROM    Sucursales
@@ -677,12 +698,12 @@ CREATE PROCEDURE CrearCuenta(
 BEGIN
     DECLARE sucursal_existe INT;
     SELECT COUNT(*) INTO sucursal_existe FROM Sucursales WHERE nombreSuc = p_NombreSuc;
-    
+
     IF sucursal_existe > 0 THEN
         INSERT INTO Cuentas (numeroCta, saldo, nombreSuc)
         VALUES (p_NumeroCta, p_Saldo, p_NombreSuc);
     ELSE
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La sucursal especificada no existe';
     END IF;
 END //

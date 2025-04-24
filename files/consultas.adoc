@@ -728,6 +728,63 @@ FROM  (SELECT nombrecli, ( SELECT      Cu.numerocta
 WHERE	Aux.mejorCuenta = Cuentas.numeroCta;
 ----
 
+==== Common Table Expressions (CTE)
+
+Las CTE son una forma de definir subconsultas que pueden ser referenciadas múltiples veces dentro de una consulta. Se definen utilizando la cláusula `WITH` y son útiles para mejorar la legibilidad y organización de las consultas complejas. Podemos entender las CTE como una forma de crear tablas temporales que pueden ser referenciadas en la consulta principal. Esto es especialmente útil cuando se necesita realizar múltiples operaciones sobre el mismo conjunto de datos o cuando se desea dividir una consulta compleja en partes más manejables y definir una consulta por partes. La sintaxis básica de una CTE es la siguiente:
+
+[source,sql]
+----
+WITH nombre_cte AS (
+    SELECT columna1, columna2, ...
+    FROM tabla
+    WHERE condiciones
+)
+SELECT *
+FROM nombre_cte, otras_tablas
+WHERE condiciones_adicionales;
+----
+
+En esta sintaxis:
+
+* `WITH nombre_cte AS (...)`: Define la CTE con un nombre específico (`nombre_cte`) y la consulta que se utilizará para generar los datos de la CTE.
+* `SELECT columna1, columna2, ...`: Especifica las columnas que se desean seleccionar de la CTE.
+* `FROM nombre_cte, otras_tablas`: Indica que se utilizará la CTE como una tabla en la consulta principal, junto con otras tablas si es necesario.
+* `WHERE condiciones_adicionales`: Especifica condiciones adicionales para filtrar los resultados de la consulta principal.
+
+La consulta que se muestra a continuación ilustra el uso de CTE para obtener los empleados que trabajan en la misma sucursal que el empleado `Smith`, excluyendo a `Smith` de la lista de resultados. La consulta se divide en dos partes: la primera parte define la CTE y la segunda parte utiliza esa CTE para filtrar los resultados.
+
+[source,sql]
+----
+WITH SucursalDeSmith AS (
+    SELECT nombresuc
+    FROM Empleados
+    WHERE nombreemp = 'Smith'
+)
+SELECT nombreemp
+FROM Empleados
+WHERE nombresuc IN (SELECT nombresuc FROM SucursalDeSmith)
+      AND nombreemp <> 'Smith';
+----
+
+Otro ejemplo útil puede ser cuando realizamos agrupaciones y queremos mostrar en el `SELECT` columnas que ni están en la cláusula `GROUP BY` ni se usan con una función de agregación. En este caso, podemos usar una CTE para realizar la agrupación y luego hacer un `JOIN` con la tabla original para obtener las columnas adicionales que necesitamos. La consulta sería la siguiente, que muestra el número de cuentas por sucursal y la ciudad de cada sucursal:
+
+[source,sql]
+----
+WITH CuentasAgrupadas AS (
+    SELECT nombreSuc, COUNT(*) AS numCuentas
+    FROM Cuentas
+    GROUP BY nombreSuc
+)
+SELECT CuentasAgrupadas.nombreSuc, CuentasAgrupadas.numCuentas, Sucursales.ciudadsuc
+FROM CuentasAgrupadas
+JOIN Sucursales ON CuentasAgrupadas.nombreSuc = Sucursales.nombreSuc;
+----
+Esta consulta SQL utiliza una CTE para contar el número de cuentas por sucursal y luego une esa información con la tabla `Sucursales` para obtener la ciudad de cada sucursal. 
+
+La consulta se divide en dos partes:
+* La primera parte define la CTE `CuentasAgrupadas`, que cuenta el número de cuentas (`COUNT(*)`) por sucursal (`nombreSuc`) y agrupa los resultados por sucursal (`GROUP BY nombreSuc`).
+* La segunda parte selecciona el nombre de la sucursal (`CuentasAgrupadas.nombreSuc`), el número de cuentas (`CuentasAgrupadas.numCuentas`) y la ciudad de la sucursal (`Sucursales.ciudadsuc`) de la CTE `CuentasAgrupadas` y la tabla `Sucursales`. La unión se realiza utilizando el campo `nombreSuc` para relacionar ambas tablas.
+
 === Los operadores `EXISTS`, `ALL` y `ANY`
 
 Los operadores `EXISTS`, `ALL` y `ANY` son utilizados en SQL para realizar comparaciones y filtrados en subconsultas. A continuación, se explican cada uno de ellos:
